@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GORO DESIGN — クリエイタープロフィール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--black:#0f0f0e;--white:#fafaf8;--g1:#f0efe9;--g2:#d4d1ca;--g3:#8a877f;--g4:#5a5855;--green:#1e5c4e;--green-l:#d6ede6;--bd:2px solid #d4d1ca;--bd-dark:2px solid #0f0f0e;--sans:'Noto Sans JP',sans-serif;--serif:'Shippori Mincho',serif;--w:760px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--white);color:var(--black);font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;font-weight:500}
+  nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;background:var(--white);border-bottom:var(--bd)}
+  .logo{font-family:var(--serif);font-size:16px;letter-spacing:.12em;text-decoration:none;color:var(--black);font-weight:600}
+  .back-link{font-size:13px;color:var(--g4);text-decoration:none}.back-link:hover{color:var(--black)}
+
+  /* HERO */
+  .hero{padding:72px 40px 56px;border-bottom:var(--bd-dark)}
+  .hero-inn{max-width:var(--w);margin:0 auto;display:grid;grid-template-columns:120px 1fr;gap:40px;align-items:center}
+  .hero-avatar{width:120px;height:120px;border-radius:50%;background:var(--g1);border:var(--bd-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0}
+  .hero-avatar img{width:100%;height:100%;object-fit:cover}
+  .hero-type{font-size:11px;letter-spacing:.2em;color:var(--green);margin-bottom:8px;font-weight:500}
+  .hero-name{font-family:var(--serif);font-size:clamp(28px,4vw,40px);font-weight:600;margin-bottom:10px}
+  .hero-spec{font-size:13px;color:var(--g4);line-height:1.7;font-weight:500;white-space:pre-line}
+
+  /* SECTIONS */
+  .sec{padding:56px 40px}
+  .inn{max-width:var(--w);margin:0 auto}
+  .sec-ey{font-size:11px;letter-spacing:.22em;color:var(--g3);display:block;margin-bottom:10px;font-weight:400}
+  .sec-h{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:20px}
+  .div{height:2px;background:var(--g2);margin:0 40px}
+  .bg1{background:var(--g1)}
+
+  /* BIO */
+  .bio-text{font-size:14px;color:var(--g4);line-height:2;font-weight:500}
+
+  /* WORKS GALLERY */
+  .works-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .work-img{aspect-ratio:1;overflow:hidden;background:var(--g1);border:var(--bd)}
+  .work-img img{width:100%;height:100%;object-fit:cover}
+  .no-works{font-size:13px;color:var(--g3);font-weight:500;padding:20px 0}
+
+  /* LINKS */
+  .links-grid{display:flex;flex-direction:column;gap:12px}
+  .link-item{display:flex;align-items:center;gap:14px;padding:16px 20px;border:var(--bd);text-decoration:none;color:var(--black);transition:background .15s}
+  .link-item:hover{background:var(--g1)}
+  .link-icon{font-size:20px;flex-shrink:0}
+  .link-label{font-size:11px;letter-spacing:.1em;color:var(--g3);margin-bottom:2px;font-weight:500}
+  .link-url{font-size:13px;color:var(--black);font-weight:400}
+  .link-arr{margin-left:auto;font-size:14px;color:var(--g3)}
+  .no-links{font-size:13px;color:var(--g3);font-weight:500;padding:20px 0}
+
+  /* CTA */
+  .cta-box{background:var(--black);color:var(--white);padding:48px 40px;text-align:center}
+  .cta-h{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:10px;color:var(--white)}
+  .cta-p{font-size:13px;color:#888;margin-bottom:28px;font-weight:500}
+  .cta-btn{display:inline-block;padding:14px 36px;background:var(--white);color:var(--black);text-decoration:none;font-size:14px;font-weight:500;transition:opacity .15s}
+  .cta-btn:hover{opacity:.85}
+
+  /* NOT FOUND */
+  .not-found{padding:80px 40px;text-align:center}
+  .not-found h2{font-family:var(--serif);font-size:22px;margin-bottom:12px}
+  .not-found p{font-size:14px;color:var(--g4);margin-bottom:24px}
+  .not-found a{color:var(--green);text-decoration:none;font-size:14px}
+
+  footer{padding:28px 40px;border-top:var(--bd-dark);display:flex;justify-content:space-between;align-items:center}
+  .fl-logo{font-family:var(--serif);font-size:15px;letter-spacing:.1em;font-weight:600}
+  .fl-copy{font-size:12px;color:var(--g3);font-weight:500}
+
+  @media(max-width:600px){
+    nav{padding:0 20px}.hero,.sec{padding:48px 20px}.div{margin:0 20px}
+    .hero-inn{grid-template-columns:80px 1fr;gap:20px}
+    .hero-avatar{width:80px;height:80px;font-size:28px}
+    .works-gallery{grid-template-columns:repeat(2,1fr)}
+    footer{flex-direction:column;gap:12px;text-align:center}
+    .cta-box{padding:40px 20px}
+  }
+</style>
+<script>/* goro_data.js があれば読み込む */</script>
+<script src="goro_data.js" onerror=""></script>
+</head>
+<body>
+
+<nav>
+  <a href="goro_more.html?view=creators" class="back-link">← クリエイター一覧</a>
+  <a href="goro_design_v6.html" class="logo">GORO DESIGN</a>
+  <span style="width:120px"></span>
+</nav>
+
+<div id="creator-content"></div>
+
+<footer>
+  <span class="fl-logo">GORO DESIGN</span>
+  <span class="fl-copy">Copyright 2026 gorodesign</span>
+</footer>
+
+<script>
+function render(){
+  const raw=localStorage.getItem('goro_viewing_creator');
+  const el=document.getElementById('creator-content');
+  if(!raw){
+    el.innerHTML=`<div class="not-found"><h2>データが見つかりません</h2><p>一度クリエイター一覧に戻ってください。</p><a href="goro_more.html?view=creators">← クリエイター一覧に戻る</a></div>`;
+    return;
+  }
+  const c=JSON.parse(raw);
+  document.title=`GORO DESIGN — ${c.name}`;
+
+  /* ── HERO ── */
+  const av=c.avatar?`<div class="hero-avatar"><img src="${c.avatar}" alt="${c.name}"></div>`:`<div class="hero-avatar">${c.emoji||'👤'}</div>`;
+  let html=`<section class="hero"><div class="hero-inn">${av}<div><p class="hero-type">${c.type||''}</p><h1 class="hero-name">${c.name}</h1><p class="hero-spec">${c.spec||''}</p></div></div></section><div class="div"></div>`;
+
+  /* ── BIO ── */
+  if(c.bio){
+    html+=`<section class="sec"><div class="inn"><span class="sec-ey">ABOUT</span><h2 class="sec-h">自己紹介</h2><p class="bio-text">${c.bio.replace(/\n/g,'<br>')}</p></div></section><div class="div"></div>`;
+  }
+
+  /* ── WORKS ── */
+  html+=`<section class="sec bg1"><div class="inn"><span class="sec-ey">WORKS</span><h2 class="sec-h">作品</h2>`;
+  if(c.works&&c.works.length){
+    html+=`<div class="works-gallery">`;
+    c.works.forEach(w=>{html+=`<div class="work-img"><img src="${w}" loading="lazy"></div>`;});
+    html+=`</div>`;
+  } else {
+    html+=`<p class="no-works">作品画像は準備中です。</p>`;
+  }
+  html+=`</div></section><div class="div"></div>`;
+
+  /* ── LINKS ── */
+  const hasLinks=c.instagram||c.twitter||c.link;
+  html+=`<section class="sec"><div class="inn"><span class="sec-ey">LINKS</span><h2 class="sec-h">SNS・ポートフォリオ</h2>`;
+  if(hasLinks){
+    html+=`<div class="links-grid">`;
+    if(c.instagram) html+=linkItem('📸','Instagram',c.instagram);
+    if(c.twitter)   html+=linkItem('𝕏','X (Twitter)',c.twitter);
+    if(c.link)      html+=linkItem('🌐',c.linkText||'ポートフォリオ・HP',c.link);
+    html+=`</div>`;
+  } else {
+    html+=`<p class="no-links">リンクは準備中です。</p>`;
+  }
+  html+=`</div></section>`;
+
+  /* ── CTA ── */
+  html+=`<div class="cta-box"><p class="cta-h">${c.name}への仕事のご依頼はゴローデザインへ</p><p class="cta-p">ARデザインのご相談・クリエイターへの案件はお気軽にどうぞ。</p><a href="goro_design_v6.html#contact" class="cta-btn">お問い合わせはこちら →</a></div>`;
+
+  el.innerHTML=html;
+}
+
+function linkItem(icon,label,url){
+  const display=url.replace(/https?:\/\//,'').replace(/\/$/,'');
+  return `<a href="${url}" target="_blank" class="link-item"><span class="link-icon">${icon}</span><div><p class="link-label">${label}</p><p class="link-url">${display}</p></div><span class="link-arr">→</span></a>`;
+}
+
+render();
+</script>
+</body>
+</html>

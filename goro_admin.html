@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GORO DESIGN 管理ハブ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;background:#0a0a0a;color:#fafaf8;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:48px 32px}
+  .logo{font-family:'Shippori Mincho',serif;font-size:14px;letter-spacing:.12em;color:#555;margin-bottom:40px;display:block}
+  h1{font-family:'Shippori Mincho',serif;font-size:28px;font-weight:600;margin-bottom:8px}
+  .subtitle{font-size:13px;color:#666;margin-bottom:48px}
+
+  /* ステータスカード */
+  .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:40px}
+  .status-card{background:#181816;border:1px solid #2a2a28;padding:20px 24px}
+  .status-label{font-size:11px;letter-spacing:.16em;color:#555;margin-bottom:8px}
+  .status-num{font-family:'Shippori Mincho',serif;font-size:32px;font-weight:600;color:#fafaf8}
+  .status-unit{font-size:13px;color:#666;margin-left:4px}
+
+  /* メインボタン */
+  .download-section{background:#181816;border:1px solid #333;padding:32px;margin-bottom:32px}
+  .dl-title{font-size:16px;font-weight:500;margin-bottom:8px}
+  .dl-desc{font-size:13px;color:#888;line-height:1.7;margin-bottom:24px}
+  .dl-btn{width:100%;padding:18px;font-size:16px;font-weight:700;background:#fafaf8;color:#0a0a0a;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;letter-spacing:.04em;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:10px}
+  .dl-btn:hover{opacity:.88}
+  .dl-btn.loading{opacity:.6;cursor:not-allowed}
+  .dl-note{font-size:11px;color:#555;margin-top:12px;line-height:1.6}
+
+  /* 手順 */
+  .steps-title{font-size:13px;color:#888;letter-spacing:.1em;margin-bottom:16px}
+  .steps{display:flex;flex-direction:column;gap:0;border:1px solid #2a2a28;margin-bottom:32px}
+  .step{display:flex;align-items:flex-start;gap:16px;padding:16px 20px;border-bottom:1px solid #2a2a28}
+  .step:last-child{border-bottom:none}
+  .step-n{width:28px;height:28px;border-radius:50%;background:#fafaf8;color:#0a0a0a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+  .step-body{flex:1}
+  .step-t{font-size:13px;font-weight:500;margin-bottom:3px}
+  .step-d{font-size:12px;color:#666;line-height:1.6}
+  .step-url{font-size:12px;color:#4a9eff;background:#1a2a3a;padding:4px 10px;display:inline-block;margin-top:6px;text-decoration:none}
+
+  /* 編集リンク */
+  .edit-title{font-size:13px;color:#888;letter-spacing:.1em;margin-bottom:12px}
+  .edit-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px}
+  .edit-link{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border:1px solid #2a2a28;text-decoration:none;color:#fafaf8;font-size:13px;font-weight:500;transition:background .15s}
+  .edit-link:hover{background:#181816}
+  .edit-link-sub{font-size:11px;color:#666;margin-top:2px;font-weight:400}
+
+  /* ログイン画面 */
+  #login-screen{position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:20px}
+  .login-logo{font-family:'Shippori Mincho',serif;font-size:18px;letter-spacing:.14em;color:#555}
+  .login-box{background:#181816;border:1px solid #333;padding:32px;width:320px}
+  .login-label{font-size:12px;color:#888;margin-bottom:8px;display:block}
+  .login-input{width:100%;padding:12px;font-size:15px;background:#0a0a0a;border:1px solid #333;color:#fafaf8;font-family:'Noto Sans JP',sans-serif;outline:none;letter-spacing:.1em}
+  .login-input:focus{border-color:#666}
+  .login-btn{width:100%;padding:13px;font-size:14px;font-weight:500;background:#fafaf8;color:#0a0a0a;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:12px}
+  .login-err{font-size:12px;color:#c0392b;margin-top:8px;display:none}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:#1e5c4e;color:#fff;padding:12px 20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:200}
+  .toast.show{opacity:1}
+  footer{font-size:11px;color:#333;text-align:center;padding-top:24px;border-top:1px solid #1a1a18}
+  a.top-link{color:#555;text-decoration:none;font-size:12px}
+  a.top-link:hover{color:#fafaf8}
+</style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="login-screen">
+  <p class="login-logo">GORO DESIGN</p>
+  <div class="login-box">
+    <label class="login-label">管理パスワード</label>
+    <input class="login-input" id="pw-input" type="password" placeholder="••••••••"
+           onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">ログイン</button>
+    <p class="login-err" id="login-err">パスワードが違います</p>
+  </div>
+</div>
+
+<!-- 管理画面 -->
+<div class="wrap" id="main-content" style="display:none">
+  <span class="logo">GORO DESIGN</span>
+  <h1>管理ハブ</h1>
+  <p class="subtitle">事例・クリエイターの編集が終わったらダウンロードしてNetlifyにアップロードしてください</p>
+
+  <!-- ステータス -->
+  <div class="status-grid">
+    <div class="status-card">
+      <p class="status-label">現在の事例数</p>
+      <p class="status-num" id="case-count">—</p>
+      <span class="status-unit">件</span>
+    </div>
+    <div class="status-card">
+      <p class="status-label">現在のクリエイター数</p>
+      <p class="status-num" id="cr-count">—</p>
+      <span class="status-unit">名</span>
+    </div>
+  </div>
+
+  <!-- ダウンロード -->
+  <div class="download-section">
+    <p class="dl-title">📥 サイトデータをダウンロード</p>
+    <p class="dl-desc">
+      事例・クリエイターの編集内容をまとめた <code style="background:#222;padding:2px 6px;font-size:12px">goro_data.js</code> を生成します。<br>
+      このファイルをフォルダに入れてNetlifyにアップロードすると、すべての訪問者に最新の内容が表示されます。
+    </p>
+    <button class="dl-btn" id="dl-btn" onclick="downloadData()">
+      📥 &nbsp; goro_data.js をダウンロード
+    </button>
+    <p class="dl-note">
+      ※ 生成後は <strong>goro_design_v6フォルダの中</strong> に入れてください（既存のファイルがあれば上書き）<br>
+      ※ 画像データも含まれるためファイルサイズが大きい場合があります
+    </p>
+  </div>
+
+  <!-- 手順 -->
+  <p class="steps-title">NETLIFY へのアップロード手順</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-body">
+        <p class="step-t">上のボタンで goro_data.js をダウンロード</p>
+        <p class="step-d">ダウンロードフォルダに保存される</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <p class="step-t">goro_data.js を goro_design_v6 フォルダに移動</p>
+        <p class="step-d">既存のファイルがあれば上書きしてください</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-body">
+        <p class="step-t">Netlify Drop にアクセス</p>
+        <p class="step-d">下のURLをChromeで開く</p>
+        <a href="https://app.netlify.com/drop" target="_blank" class="step-url">https://app.netlify.com/drop</a>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">4</div>
+      <div class="step-body">
+        <p class="step-t">goro_design_v6 フォルダをドラッグ＆ドロップ</p>
+        <p class="step-d">数秒でアップロード完了。URLが発行されれば完了 ✓</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 編集リンク -->
+  <p class="edit-title">コンテンツを編集する</p>
+  <div class="edit-links">
+    <a href="goro_cases.html" class="edit-link">
+      <div>
+        <p>事例を編集</p>
+        <p class="edit-link-sub" id="cases-link-sub">—</p>
+      </div>
+      <span style="color:#555">→</span>
+    </a>
+    <a href="goro_creators.html" class="edit-link">
+      <div>
+        <p>クリエイターを編集</p>
+        <p class="edit-link-sub" id="cr-link-sub">—</p>
+      </div>
+      <span style="color:#555">→</span>
+    </a>
+  </div>
+
+  <footer>
+    <a href="goro_design_v6.html" class="top-link">← トップページに戻る</a>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PW = "goro2026";
+
+/* ── コア固定データ（全ファイルの CORE と同じ内容） ── */
+const CORE_CASES = [
+  {client:"イラストレーター823 様",type:"名刺 × キャラクターアニメ",beforeImg:"images/case1_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case1_after.jpg",afterLabel:"スマホをかざすとご自身のキャラクターが動くオリジナルアニメが流れる"},
+  {client:"株式会社ネオマチ 様",type:"カード × ゲームキャラクターAR",beforeImg:"images/case2_before.jpg",beforeLabel:"ゲームの販促カード",afterImg:"images/case2_after.jpg",afterLabel:"ゲームタイトルのキャラクターが画面に飛び出すAR体験"},
+  {client:"似顔絵師・四季彩画家 神生 様",type:"名刺 × 自己紹介動画",beforeImg:"images/case3_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case3_after.jpg",afterLabel:"ご本人様が自己紹介する動画が流れる。名刺を渡すだけで人柄まで伝わる"},
+  {client:"ギャラリーゴロー 溝口聡志",type:"名刺 × 自己紹介AR",beforeImg:"images/case4_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case4_after.jpg",afterLabel:"名刺にかざすと本人が登場。ギャラリーゴローの活動をその場で紹介できる"}
+];
+const CORE_CREATORS = [
+  {type:"MANGA",name:"クリエイター名",spec:"漫画・4コマ・ストーリー漫画\nキャラクターデザイン",avatar:null,emoji:"🎨",works:[],link:null},
+  {type:"ILLUSTRATION",name:"ナガレボシ 獅子",spec:"科学・技術イラスト\nキャラクターデザイン・アニメーション",avatar:"images/cr_leo3.jpeg",emoji:null,works:["images/cr_leo1.jpeg","images/cr_leo2.jpeg","images/cr_leo3.jpeg"],link:"https://nboshi.art",linkText:"portfolio : nboshi.art"},
+  {type:"VIDEO",name:"クリエイター名",spec:"動画制作・モーショングラフィック\nアニメーション",avatar:null,emoji:"🎥",works:[],link:null}
+];
+
+/* ── localStorage から全データを収集 ── */
+function loadLS(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return[]}}
+
+function buildExportData(){
+  const caseEdits    = loadLS('goro_core_case_edits');
+  const extraCases   = loadLS('goro_extra_cases');
+  const crEdits      = loadLS('goro_core_cr_edits');
+  const extraCrs     = loadLS('goro_extra_creators');
+
+  const effectiveCases = CORE_CASES.map((c,i) => caseEdits[i] ? {...c,...caseEdits[i]} : c);
+  const allCases = [...effectiveCases, ...extraCases];
+
+  const effectiveCrs = CORE_CREATORS.map((c,i) => crEdits[i] ? {...c,...crEdits[i]} : c);
+  const allCreators = [...effectiveCrs, ...extraCrs];
+
+  return {cases: allCases, creators: allCreators};
+}
+
+/* ── ステータス更新 ── */
+function updateStatus(){
+  const d = buildExportData();
+  document.getElementById('case-count').textContent = d.cases.length;
+  document.getElementById('cr-count').textContent   = d.creators.length;
+  document.getElementById('cases-link-sub').textContent = `現在 ${d.cases.length} 件`;
+  document.getElementById('cr-link-sub').textContent    = `現在 ${d.creators.length} 名`;
+}
+
+/* ── ダウンロード ── */
+function downloadData(){
+  const btn = document.getElementById('dl-btn');
+  btn.classList.add('loading');
+  btn.textContent = '⏳  生成中...';
+
+  setTimeout(() => {
+    try {
+      const data = buildExportData();
+      const now  = new Date().toLocaleString('ja-JP');
+      const json = JSON.stringify(data, null, 2);
+      const content = `// GORO DESIGN サイトデータ\n// 生成日時: ${now}\n// このファイルを goro_design_v6 フォルダに入れてNetlifyにアップロードしてください\n\nconst GORO_BAKED_DATA = ${json};\n`;
+
+      const blob = new Blob([content], {type:'text/javascript;charset=utf-8'});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = 'goro_data.js';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast('✓ goro_data.js をダウンロードしました');
+    } catch(e) {
+      alert('エラーが発生しました：' + e.message);
+    }
+    btn.classList.remove('loading');
+    btn.innerHTML = '📥 &nbsp; goro_data.js をダウンロード';
+  }, 100);
+}
+
+/* ── ログイン ── */
+function doLogin(){
+  const pw = document.getElementById('pw-input').value;
+  if(pw === PW){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    updateStatus();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+// Enterキーでログイン
+document.addEventListener('keydown', e => {
+  if(e.key==='Enter' && document.getElementById('login-screen').style.display!=='none') doLogin();
+});
+</script>
+</body>
+</html>

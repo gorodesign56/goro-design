@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /goro_admin.html
+Disallow: /goro_more.html
+
+Sitemap: https://goro-design.jp/sitemap.xml
