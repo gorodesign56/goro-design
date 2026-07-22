@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GORO DESIGN — 事例・クリエイター一覧</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--black:#0f0f0e;--white:#fafaf8;--g1:#f0efe9;--g2:#d4d1ca;--g3:#8a877f;--g4:#5a5855;--green:#1e5c4e;--green-l:#d6ede6;--bd:2px solid #d4d1ca;--bd-dark:2px solid #0f0f0e;--sans:'Noto Sans JP',sans-serif;--serif:'Shippori Mincho',serif;--w:1040px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--white);color:var(--black);font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;font-weight:500}
+  nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;background:var(--white);border-bottom:var(--bd)}
+  .logo{font-family:var(--serif);font-size:16px;letter-spacing:.12em;text-decoration:none;color:var(--black);font-weight:600}
+  .back-link{font-size:13px;color:var(--g4);text-decoration:none}.back-link:hover{color:var(--black)}
+  .view-toggle{display:flex;gap:0;border-bottom:var(--bd-dark);background:var(--white);padding:0 40px}
+  .vt-btn{padding:16px 28px;font-size:14px;cursor:pointer;border:none;background:none;color:var(--g3);border-bottom:3px solid transparent;margin-bottom:-2px;font-family:var(--sans);letter-spacing:.04em;transition:color .15s}
+  .vt-btn.on{color:var(--black);border-bottom-color:var(--black);font-weight:500}
+  .sec{padding:72px 40px}.inn{max-width:var(--w);margin:0 auto}
+  .sec-ey{font-size:11px;letter-spacing:.22em;color:var(--g3);display:block;margin-bottom:10px;font-weight:400}
+  .sec-h{font-family:var(--serif);font-size:26px;font-weight:600;margin-bottom:10px}
+  .sec-sub{font-size:14px;color:var(--g4);line-height:1.9;font-weight:500;margin-bottom:44px}
+  .bg1{background:var(--g1)}
+  /* CASES */
+  .cases-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--g2);border:var(--bd-dark)}
+  .case-card{background:var(--white)}
+  .case-head{padding:12px 18px;border-bottom:2px solid var(--g2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px}
+  .case-client{font-size:13px;font-weight:500}.case-type{font-size:11px;color:var(--g3);font-weight:500}
+  .case-ba{display:grid;grid-template-columns:1fr 28px 1fr}
+  .case-side-lbl{font-size:11px;letter-spacing:.12em;color:var(--g3);padding:8px 14px;border-bottom:2px solid var(--g2);font-weight:400}
+  .case-side-lbl.al{color:var(--green);font-weight:500}
+  .case-img{width:100%;aspect-ratio:4/3;background:var(--g1);display:flex;align-items:center;justify-content:center;border-bottom:2px solid var(--g2);position:relative;overflow:hidden}
+  .case-img img{width:100%;height:100%;object-fit:contain;background:var(--white)}
+  .ar-dot{position:absolute;top:10px;right:10px;font-size:10px;letter-spacing:.1em;padding:3px 8px;background:var(--black);color:var(--white);font-weight:500}
+  .case-caption{padding:12px 14px;font-size:12px;color:var(--g4);line-height:1.7;font-weight:500;display:flex;align-items:flex-start;gap:6px}
+  .chk{color:var(--green);font-size:13px;margin-top:1px;flex-shrink:0}
+  .arr-col{display:flex;align-items:center;justify-content:center;border-left:2px solid var(--g2);border-right:2px solid var(--g2);font-size:16px;color:var(--g3)}
+  /* CREATORS — クリック可能 */
+  .cr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:var(--bd-dark);background:var(--g2)}
+  .cr-card{background:var(--white);padding:32px 28px;cursor:pointer;transition:background .15s;position:relative}
+  .cr-card:hover{background:#f5f4ee}
+  .cr-card-link-hint{position:absolute;bottom:14px;right:16px;font-size:11px;color:var(--g3);font-weight:500}
+  .cr-type{font-size:11px;letter-spacing:.16em;color:var(--green);margin-bottom:14px;font-weight:500}
+  .cr-avatar{width:64px;height:64px;border-radius:50%;background:var(--g1);border:var(--bd);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;overflow:hidden}
+  .cr-avatar img{width:100%;height:100%;object-fit:cover}
+  .cr-name{font-family:var(--serif);font-size:18px;margin-bottom:14px;font-weight:600}
+  .cr-spec{font-size:12px;color:var(--g4);margin-bottom:18px;line-height:1.7;font-weight:500;white-space:pre-line}
+  .cr-works{display:flex;gap:4px;margin-bottom:14px}
+  .cr-work{width:52px;height:52px;background:var(--g1);border:2px solid var(--g2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--g3)}
+  .cr-work img{width:100%;height:100%;object-fit:cover}
+  /* FOOTER */
+  footer{padding:28px 40px;border-top:var(--bd-dark);display:flex;justify-content:space-between;align-items:center}
+  .fl-logo{font-family:var(--serif);font-size:15px;letter-spacing:.1em;font-weight:600}
+  .fl-copy{font-size:12px;color:var(--g3);font-weight:500}
+  .admin-trigger{font-size:11px;color:var(--g2);background:none;border:none;cursor:pointer;font-family:var(--sans);transition:color .2s;padding:4px 8px}
+  .admin-trigger:hover{color:var(--g3)}
+  /* ADMIN */
+  #admin-panel{display:none;background:#0f0f0e;color:#fafaf8;padding:72px 40px}
+  .admin-inn{max-width:860px;margin:0 auto}
+  .admin-h{font-family:var(--serif);font-size:22px;color:#fafaf8;margin-bottom:6px;font-weight:600}
+  .admin-sub{font-size:13px;color:#888;margin-bottom:40px;font-weight:500;line-height:1.8}
+  .admin-tabs{display:flex;gap:0;border-bottom:1px solid #333;margin-bottom:32px}
+  .atab{padding:8px 20px;font-size:13px;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--sans)}
+  .atab.on{color:#fafaf8;border-bottom-color:#fafaf8}
+  .apanel{display:none}.apanel.on{display:block}
+  .arow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .arow1{margin-bottom:16px}
+  .albl{display:block;font-size:11px;color:#888;margin-bottom:6px;font-weight:500}
+  .ainput,.atextarea{width:100%;font-size:13px;padding:10px 12px;border:1px solid #333;background:#181816;color:#fafaf8;font-family:var(--sans);outline:none;transition:border-color .15s;border-radius:0}
+  .ainput:focus,.atextarea:focus{border-color:#666}
+  .atextarea{height:72px;resize:none}
+  /* 画像ピッカー */
+  .img-pick-btn{width:100%;padding:0;border:2px dashed #333;background:#0f0f0e;cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;transition:border-color .2s}
+  .img-pick-btn:hover{border-color:#666}
+  .img-pick-btn.has-img{border-style:solid;border-color:#555}
+  .img-pick-btn img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#111;pointer-events:none}
+  .img-pick-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .pick-icon{font-size:24px;color:#555;pointer-events:none;z-index:1}
+  .pick-label{font-size:11px;color:#555;pointer-events:none;z-index:1;text-align:center;line-height:1.5}
+  .pick-overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);padding:5px;font-size:10px;color:#aaa;text-align:center;pointer-events:none;z-index:2}
+  /* クリア(×)ボタン */
+  .pick-clear{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid #666;color:#ccc;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:3;line-height:1;pointer-events:all}
+  .img-pick-btn.has-img .pick-clear{display:flex}
+  /* 作品ピッカー */
+  .work-pickers{display:flex;gap:8px;margin-top:4px}
+  .work-pick-btn{flex:1;aspect-ratio:1;border:2px dashed #333;background:#0f0f0e;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
+  .work-pick-btn:hover{border-color:#666}
+  .work-pick-btn.has-img{border-style:solid;border-color:#555}
+  .work-pick-btn img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+  .work-pick-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .work-pick-btn span.plus{font-size:18px;color:#444;pointer-events:none}
+  .work-pick-btn .pick-clear{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid #666;color:#ccc;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:3;line-height:1;pointer-events:all}
+  .work-pick-btn.has-img .pick-clear{display:flex}
+  /* 顔写真 */
+  .avatar-pick-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+  .avatar-pick-btn{width:80px;height:80px;border-radius:50%;border:2px dashed #333;background:#181816;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s}
+  .avatar-pick-btn:hover{border-color:#666}
+  .avatar-pick-btn.has-img{border-style:solid;border-color:#555}
+  .avatar-pick-btn img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+  .avatar-pick-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .avatar-pick-btn span{font-size:24px;pointer-events:none}
+  .avatar-pick-note{font-size:12px;color:#666;line-height:1.7}
+  .avatar-clear{display:none;margin-top:6px;font-size:11px;color:#c0392b;background:none;border:1px solid #c0392b;padding:3px 10px;cursor:pointer;font-family:var(--sans)}
+  .avatar-pick-btn.has-img ~ .avatar-clear{display:block}
+  .asave-btn{padding:12px 32px;font-size:14px;font-weight:500;background:#fafaf8;color:#0f0f0e;border:none;cursor:pointer;font-family:var(--sans);transition:opacity .15s;margin-top:8px}
+  .asave-btn:hover{opacity:.85}
+  .entry-list{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+  .entry-item{display:flex;align-items:center;gap:12px;background:#181816;border:1px solid #2a2a28;padding:10px 14px}
+  .entry-thumb{width:40px;height:40px;object-fit:cover;flex-shrink:0;background:#222}
+  .entry-name{font-size:13px;color:#ccc;flex:1}
+  .entry-sub{font-size:11px;color:#555}
+  .adel-btn{background:none;border:1px solid #333;color:#888;font-size:11px;padding:4px 10px;cursor:pointer;font-family:var(--sans);flex-shrink:0}
+  .adel-btn:hover{border-color:#c0392b;color:#c0392b}
+  .core-badge{font-size:10px;color:#555;border:1px solid #333;padding:2px 6px;margin-left:6px}
+  .close-admin-btn{margin-top:32px;font-size:13px;color:#555;background:none;border:1px solid #333;padding:8px 20px;cursor:pointer;font-family:var(--sans)}
+  .close-admin-btn:hover{color:#fafaf8;border-color:#666}
+  .section-lbl{font-size:12px;color:#666;margin:20px 0 8px;font-weight:500}
+  .toast{position:fixed;bottom:32px;right:32px;background:#1e5c4e;color:#fff;padding:12px 20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+  .toast.show{opacity:1}
+  @media(max-width:768px){
+    nav,.view-toggle{padding:0 20px}.sec{padding:48px 20px}
+    .cases-grid,.cr-grid{grid-template-columns:1fr}
+    .case-ba{grid-template-columns:1fr}.arr-col{display:none}
+    .arow{grid-template-columns:1fr}
+    footer{flex-direction:column;gap:12px;text-align:center}
+    #admin-panel{padding:48px 20px}
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="goro_design_v6.html" class="back-link">← トップに戻る</a>
+  <a href="goro_design_v6.html" class="logo">GORO DESIGN</a>
+  <span style="width:120px"></span>
+</nav>
+<div class="view-toggle">
+  <button class="vt-btn" id="vt-cases" onclick="switchView('cases')">事例一覧</button>
+  <button class="vt-btn" id="vt-creators" onclick="switchView('creators')">クリエイター一覧</button>
+</div>
+
+<section id="sec-cases" class="sec bg1">
+  <div class="inn">
+    <span class="sec-ey">ALL CASES</span>
+    <h2 class="sec-h">事例一覧</h2>
+    <p class="sec-sub">ゴローデザインが手掛けたARデザインの実績です。</p>
+    <div class="cases-grid" id="all-cases-grid"></div>
+  </div>
+</section>
+
+<section id="sec-creators" class="sec" style="display:none">
+  <div class="inn">
+    <span class="sec-ey">ALL CREATORS</span>
+    <h2 class="sec-h">クリエイター一覧</h2>
+    <p class="sec-sub">クリエイターの名前や写真をクリックすると詳細が見られます。</p>
+    <div class="cr-grid" id="all-cr-grid"></div>
+  </div>
+</section>
+
+<footer>
+  <span class="fl-logo">GORO DESIGN</span>
+  <span class="fl-copy">Copyright 2026 gorodesign</span>
+  <button class="admin-trigger" onclick="openAdmin()">管理</button>
+</footer>
+
+<div id="admin-panel">
+  <div class="admin-inn">
+    <h2 class="admin-h">管理モード</h2>
+    <p class="admin-sub">
+      画像はクリックして選ぶだけ。<br>
+      ⚠️ 写真は自動で圧縮されて保存されます（高画質のまま保存すると容量オーバーになるため）。
+    </p>
+    <div class="admin-tabs">
+      <button class="atab on" onclick="aswitch('case-add',this)">事例を追加</button>
+      <button class="atab" onclick="aswitch('cr-add',this)">クリエイターを追加</button>
+      <button class="atab" onclick="aswitch('manage',this)">削除・管理</button>
+    </div>
+
+    <!-- 事例追加 -->
+    <div class="apanel on" id="ap-case-add">
+      <div class="arow">
+        <div><label class="albl">クライアント名</label><input class="ainput" id="a-client" placeholder="例：株式会社〇〇 様"></div>
+        <div><label class="albl">AR種別</label><input class="ainput" id="a-type" placeholder="例：名刺 × キャラクターアニメ"></div>
+      </div>
+      <div class="arow">
+        <div>
+          <label class="albl">Before画像（クリックして選ぶ）</label>
+          <div class="img-pick-btn" id="btn-bimg">
+            <span class="pick-icon">🖼</span>
+            <span class="pick-label">クリックして画像を選ぶ</span>
+            <button class="pick-clear" onclick="clearPick(event,'bimg')">×</button>
+            <input type="file" accept="image/*" onchange="pickImg(this,'bimg','btn-bimg')">
+          </div>
+        </div>
+        <div>
+          <label class="albl">After AR画像（クリックして選ぶ）</label>
+          <div class="img-pick-btn" id="btn-aimg">
+            <span class="pick-icon">📱</span>
+            <span class="pick-label">クリックして画像を選ぶ</span>
+            <button class="pick-clear" onclick="clearPick(event,'aimg','btn-aimg')">×</button>
+            <input type="file" accept="image/*" onchange="pickImg(this,'aimg','btn-aimg')">
+          </div>
+        </div>
+      </div>
+      <div class="arow">
+        <div><label class="albl">Beforeの説明</label><input class="ainput" id="a-blbl" value="普段の名刺" placeholder="例：普段の名刺"></div>
+        <div><label class="albl">After ARの説明文</label><input class="ainput" id="a-albl" placeholder="例：スマホをかざすと〇〇が動く"></div>
+      </div>
+      <button class="asave-btn" onclick="saveCase()">追加する</button>
+    </div>
+
+    <!-- クリエイター追加 -->
+    <div class="apanel" id="ap-cr-add">
+      <div class="avatar-pick-wrap">
+        <div>
+          <div class="avatar-pick-btn" id="btn-avatar">
+            <span>👤</span>
+            <input type="file" accept="image/*" onchange="pickImg(this,'avatar','btn-avatar')">
+          </div>
+        </div>
+        <p class="avatar-pick-note">顔写真をクリックして選ぶ<br><span style="color:#555">（なくてもOK）</span><br>
+          <button class="avatar-clear" id="avatar-clear-btn" onclick="clearPick(event,'avatar','btn-avatar')">顔写真を取り消す</button>
+        </p>
+      </div>
+      <div class="arow">
+        <div><label class="albl">ジャンルタグ</label><input class="ainput" id="a-crtype" placeholder="MANGA / ILLUSTRATION / VIDEO"></div>
+        <div><label class="albl">クリエイター名</label><input class="ainput" id="a-crname" placeholder="例：ナガレボシ 獅子"></div>
+      </div>
+      <div class="arow">
+        <div><label class="albl">専門・得意分野（2行まで）</label><textarea class="atextarea" id="a-crspec" placeholder="例：科学・技術イラスト&#10;キャラクターデザイン"></textarea></div>
+        <div><label class="albl">自己紹介文（任意）</label><textarea class="atextarea" id="a-crbio" placeholder="例：大阪を拠点に活動するイラストレーターです。"></textarea></div>
+      </div>
+      <div class="arow">
+        <div><label class="albl">Instagram URL（任意）</label><input class="ainput" id="a-crinsta" placeholder="https://instagram.com/xxxx"></div>
+        <div><label class="albl">X(Twitter) URL（任意）</label><input class="ainput" id="a-crtwitter" placeholder="https://x.com/xxxx"></div>
+      </div>
+      <div class="arow">
+        <div><label class="albl">ポートフォリオ・HP URL（任意）</label><input class="ainput" id="a-crlink" placeholder="https://example.com"></div>
+        <div></div>
+      </div>
+      <div class="arow1">
+        <label class="albl">作品サムネ（最大3枚・クリックして選ぶ）</label>
+        <div class="work-pickers">
+          <div class="work-pick-btn" id="btn-w0"><span class="plus">＋</span><button class="pick-clear" onclick="clearWork(event,0)">×</button><input type="file" accept="image/*" onchange="pickWork(this,0)"></div>
+          <div class="work-pick-btn" id="btn-w1"><span class="plus">＋</span><button class="pick-clear" onclick="clearWork(event,1)">×</button><input type="file" accept="image/*" onchange="pickWork(this,1)"></div>
+          <div class="work-pick-btn" id="btn-w2"><span class="plus">＋</span><button class="pick-clear" onclick="clearWork(event,2)">×</button><input type="file" accept="image/*" onchange="pickWork(this,2)"></div>
+        </div>
+      </div>
+      <button class="asave-btn" onclick="saveCreator()">追加する</button>
+    </div>
+
+    <!-- 削除・管理 -->
+    <div class="apanel" id="ap-manage">
+      <p style="font-size:13px;color:#888;margin-bottom:16px">「コア」と表示されている3件は削除できません。</p>
+      <p class="section-lbl">▼ 事例</p>
+      <div class="entry-list" id="manage-cases"></div>
+      <p class="section-lbl">▼ クリエイター</p>
+      <div class="entry-list" id="manage-crs"></div>
+    </div>
+
+    <button class="close-admin-btn" onclick="closeAdmin()">管理モードを閉じる</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CORE_CASES=[
+  {client:"イラストレーター823 様",type:"名刺 × キャラクターアニメ",beforeImg:"images/case1_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case1_after.jpg",afterLabel:"スマホをかざすとご自身のキャラクターが動くオリジナルアニメが流れる"},
+  {client:"株式会社ネオマチ 様",type:"カード × ゲームキャラクターAR",beforeImg:"images/case2_before.jpg",beforeLabel:"ゲームの販促カード",afterImg:"images/case2_after.jpg",afterLabel:"ゲームタイトルのキャラクターが画面に飛び出すAR体験"},
+  {client:"似顔絵師・四季彩画家 神生 様",type:"名刺 × 自己紹介動画",beforeImg:"images/case3_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case3_after.jpg",afterLabel:"ご本人様が自己紹介する動画が流れる。名刺を渡すだけで人柄まで伝わる"}
+];
+const CORE_CREATORS=[
+  {type:"MANGA",name:"クリエイター名",spec:"漫画・4コマ・ストーリー漫画\nキャラクターデザイン",avatar:null,emoji:"🎨",works:[],link:null},
+  {type:"ILLUSTRATION",name:"ナガレボシ 獅子",spec:"科学・技術イラスト\nキャラクターデザイン・アニメーション",avatar:"images/cr_leo3.jpeg",emoji:null,works:["images/cr_leo1.jpeg","images/cr_leo2.jpeg","images/cr_leo3.jpeg"],link:"https://nboshi.art",linkText:"portfolio : nboshi.art"},
+  {type:"VIDEO",name:"クリエイター名",spec:"動画制作・モーショングラフィック\nアニメーション",avatar:null,emoji:"🎥",works:[],link:null}
+];
+const ADMIN_PW="goro2026",LS_CASES="goro_extra_cases",LS_CRS="goro_extra_creators";
+let tmpImgs={bimg:null,aimg:null,avatar:null,works:[null,null,null]};
+
+function getExtra(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]}}
+function setExtra(k,a){try{localStorage.setItem(k,JSON.stringify(a));return true}catch(e){alert('保存容量が不足しています。「削除・管理」タブから古いデータを削除してください。');return false}}
+function v(id){return document.getElementById(id).value.trim()}
+
+/* ── 画像圧縮 (最大600px, JPEG 72%) ── */
+async function compressFile(file){
+  return new Promise(resolve=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const MAX=600;
+      let w=img.naturalWidth,h=img.naturalHeight;
+      const r=Math.min(MAX/w,MAX/h,1);
+      w=Math.round(w*r);h=Math.round(h*r);
+      const c=document.createElement('canvas');
+      c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg',0.72));
+    };
+    img.src=url;
+  });
+}
+
+/* ── 画像選択 ── */
+async function pickImg(input,key,btnId){
+  const f=input.files[0];if(!f)return;
+  const d=await compressFile(f);
+  tmpImgs[key]=d;
+  const btn=document.getElementById(btnId);
+  btn.classList.add('has-img');
+  let img=btn.querySelector('img.preview');
+  if(!img){img=document.createElement('img');img.className='preview';btn.insertBefore(img,btn.querySelector('input'));}
+  img.src=d;
+  btn.querySelectorAll('.pick-icon,.pick-label').forEach(el=>el.style.display='none');
+  const ov=btn.querySelector('.pick-overlay')||document.createElement('div');
+  ov.className='pick-overlay';ov.textContent='クリックで変更';
+  if(!btn.querySelector('.pick-overlay'))btn.appendChild(ov);
+}
+async function pickWork(input,i){
+  const f=input.files[0];if(!f)return;
+  const d=await compressFile(f);
+  tmpImgs.works[i]=d;
+  const btn=document.getElementById('btn-w'+i);
+  btn.classList.add('has-img');
+  let img=btn.querySelector('img.preview');
+  if(!img){img=document.createElement('img');img.className='preview';btn.insertBefore(img,btn.querySelector('input'));}
+  img.src=d;
+  btn.querySelector('span.plus').style.display='none';
+}
+
+/* ── クリア ── */
+function clearPick(e,key,btnId){
+  e.preventDefault();e.stopPropagation();
+  tmpImgs[key]=null;
+  const btn=document.getElementById(btnId||'btn-'+key);
+  btn.classList.remove('has-img');
+  const img=btn.querySelector('img.preview');if(img)img.remove();
+  const ov=btn.querySelector('.pick-overlay');if(ov)ov.remove();
+  btn.querySelectorAll('.pick-icon,.pick-label').forEach(el=>el.style.display='');
+  const fi=btn.querySelector('input[type=file]');if(fi)fi.value='';
+}
+function clearWork(e,i){
+  e.preventDefault();e.stopPropagation();
+  tmpImgs.works[i]=null;
+  const btn=document.getElementById('btn-w'+i);
+  btn.classList.remove('has-img');
+  const img=btn.querySelector('img.preview');if(img)img.remove();
+  btn.querySelector('span.plus').style.display='';
+  const fi=btn.querySelector('input[type=file]');if(fi)fi.value='';
+}
+
+/* ── 保存 ── */
+function saveCase(){
+  if(!v('a-client')){alert('クライアント名を入力してください');return}
+  if(!tmpImgs.bimg){alert('Before画像を選んでください');return}
+  if(!tmpImgs.aimg){alert('After画像を選んでください');return}
+  const arr=getExtra(LS_CASES);
+  arr.push({client:v('a-client'),type:v('a-type')||'名刺 × AR',beforeImg:tmpImgs.bimg,beforeLabel:v('a-blbl')||'普段の名刺',afterImg:tmpImgs.aimg,afterLabel:v('a-albl')||'AR体験'});
+  if(!setExtra(LS_CASES,arr))return;
+  ['a-client','a-type','a-albl'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('a-blbl').value='普段の名刺';
+  clearPick({preventDefault:()=>{},stopPropagation:()={}},'bimg','btn-bimg');
+  clearPick({preventDefault:()=>{},stopPropagation:()={}},'aimg','btn-aimg');
+  renderAll();renderManage();toast('事例を追加しました ✓');
+}
+function saveCreator(){
+  if(!v('a-crname')){alert('名前を入力してください');return}
+  const link=v('a-crlink'),works=tmpImgs.works.filter(Boolean);
+  const arr=getExtra(LS_CRS);
+  arr.push({type:v('a-crtype')||'ILLUSTRATION',name:v('a-crname'),spec:v('a-crspec'),bio:v('a-crbio'),instagram:v('a-crinsta'),twitter:v('a-crtwitter'),avatar:tmpImgs.avatar||null,emoji:tmpImgs.avatar?null:'✏️',works,link:link||null,linkText:link?'portfolio : '+link.replace(/https?:\/\//,''):''});
+  if(!setExtra(LS_CRS,arr))return;
+  ['a-crtype','a-crname','a-crspec','a-crbio','a-crinsta','a-crtwitter','a-crlink'].forEach(i=>document.getElementById(i).value='');
+  clearPick({preventDefault:()=>{},stopPropagation:()=>{}},'avatar','btn-avatar');
+  [0,1,2].forEach(i=>clearWork({preventDefault:()=>{},stopPropagation:()=>{}},i));
+  renderAll();renderManage();toast('クリエイターを追加しました ✓');
+}
+
+/* ── 削除 ── */
+function delCase(i){const a=getExtra(LS_CASES);a.splice(i,1);setExtra(LS_CASES,a);renderAll();renderManage();toast('削除しました')}
+function delCreator(i){const a=getExtra(LS_CRS);a.splice(i,1);setExtra(LS_CRS,a);renderAll();renderManage();toast('削除しました')}
+
+/* ── クリエイター詳細へ ── */
+function viewCreator(type,idx){
+  const c=type==='core'?CORE_CREATORS[idx]:getExtra(LS_CRS)[idx];
+  if(!c)return;
+  localStorage.setItem('goro_viewing_creator',JSON.stringify(c));
+  window.location.href='goro_creator_detail.html';
+}
+
+/* ── レンダリング ── */
+function caseHTML(c){
+  return `<div class="case-card">
+    <div class="case-head"><span class="case-client">${c.client}</span><span class="case-type">${c.type}</span></div>
+    <div class="case-ba">
+      <div><div class="case-side-lbl">Before</div><div class="case-img"><img src="${c.beforeImg}" loading="lazy"></div><div class="case-caption">${c.beforeLabel}</div></div>
+      <div class="arr-col">→</div>
+      <div><div class="case-side-lbl al">After AR</div><div class="case-img"><img src="${c.afterImg}" loading="lazy"><span class="ar-dot">▶ AR</span></div><div class="case-caption"><span class="chk">✓</span><span>${c.afterLabel}</span></div></div>
+    </div>
+  </div>`
+}
+function crHTML(c,type,idx){
+  const av=c.avatar?`<div class="cr-avatar"><img src="${c.avatar}"></div>`:`<div class="cr-avatar">${c.emoji||'👤'}</div>`;
+  const ws=c.works&&c.works.length?c.works.slice(0,3).map(w=>`<div class="cr-work"><img src="${w}" loading="lazy"></div>`).join(''):'<div class="cr-work">作</div><div class="cr-work">品</div><div class="cr-work">例</div>';
+  return `<div class="cr-card" onclick="viewCreator('${type}',${idx})">
+    <p class="cr-type">${c.type}</p>${av}
+    <p class="cr-name">${c.name}</p>
+    <p class="cr-spec">${c.spec||''}</p>
+    <div class="cr-works">${ws}</div>
+    <span class="cr-card-link-hint">詳細を見る →</span>
+  </div>`
+}
+function renderAll(){
+  document.getElementById('all-cases-grid').innerHTML=[...CORE_CASES,...getExtra(LS_CASES)].map(caseHTML).join('');
+  const allCrs=[...CORE_CREATORS.map((c,i)=>({c,type:'core',idx:i})),...getExtra(LS_CRS).map((c,i)=>({c,type:'extra',idx:i}))];
+  document.getElementById('all-cr-grid').innerHTML=allCrs.map(({c,type,idx})=>crHTML(c,type,idx)).join('');
+}
+function renderManage(){
+  const ec=getExtra(LS_CASES),ek=getExtra(LS_CRS);
+  const th=(img,r)=>img?`<img class="entry-thumb" src="${img}" style="${r?'border-radius:50%':''}">`:`<div class="entry-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;background:#222">?</div>`;
+  document.getElementById('manage-cases').innerHTML=
+    CORE_CASES.map(c=>`<div class="entry-item">${th(c.beforeImg)}<div class="entry-name">${c.client}<span class="core-badge">コア</span><div class="entry-sub">${c.type}</div></div></div>`).join('')+
+    ec.map((c,i)=>`<div class="entry-item">${th(c.beforeImg)}<div class="entry-name" style="flex:1">${c.client}<div class="entry-sub">${c.type}</div></div><button class="adel-btn" onclick="delCase(${i})">削除</button></div>`).join('')+
+    (!ec.length?'<p style="font-size:12px;color:#555;padding:8px 0">追加された事例はまだありません</p>':'');
+  document.getElementById('manage-crs').innerHTML=
+    CORE_CREATORS.map(c=>`<div class="entry-item">${th(c.avatar,true)}<div class="entry-name">${c.name}<span class="core-badge">コア</span><div class="entry-sub">${c.type}</div></div></div>`).join('')+
+    ek.map((c,i)=>`<div class="entry-item">${th(c.avatar,true)}<div class="entry-name" style="flex:1">${c.name}<div class="entry-sub">${c.type}</div></div><button class="adel-btn" onclick="delCreator(${i})">削除</button></div>`).join('')+
+    (!ek.length?'<p style="font-size:12px;color:#555;padding:8px 0">追加されたクリエイターはまだいません</p>':'');
+}
+function switchView(mode){
+  document.getElementById('sec-cases').style.display=mode==='cases'?'':'none';
+  document.getElementById('sec-creators').style.display=mode==='creators'?'':'none';
+  document.getElementById('vt-cases').classList.toggle('on',mode==='cases');
+  document.getElementById('vt-creators').classList.toggle('on',mode==='creators');
+  history.replaceState(null,'','?view='+mode);
+}
+function openAdmin(){
+  const pw=prompt('管理パスワードを入力してください');
+  if(pw===ADMIN_PW){document.getElementById('admin-panel').style.display='block';renderManage();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});}
+  else if(pw!==null)alert('パスワードが違います');
+}
+function closeAdmin(){document.getElementById('admin-panel').style.display='none';window.scrollTo({top:0,behavior:'smooth'});}
+function aswitch(id,el){
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.apanel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');document.getElementById('ap-'+id).classList.add('on');
+  if(id==='manage')renderManage();
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+const initView=new URLSearchParams(location.search).get('view')||'cases';
+switchView(initView);
+renderAll();
+</script>
+</body>
+</html>

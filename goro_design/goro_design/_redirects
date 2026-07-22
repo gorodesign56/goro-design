@@ -1,0 +1,27 @@
+# ゴローデザイン AR リダイレクト設定（Cloudflare _redirects 形式）
+# 24件のAR転送を維持
+
+/ar/goro01  https://player.artivive.com/artworks/6a504ff7518e26df36783bde  302
+/ar/meishi01  https://player.artivive.com/artworks/6a473ca0706c266602f31617  302
+/ar/meishi02  https://player.artivive.com/artworks/69606537d0b32f03b0f74f54  302
+/ar/moderu01  https://player.artivive.com/artworks/6a54e2b2518e26df368598e0  302
+/ar/meishi03  https://player.artivive.com/artworks/6a548355518e26df3684846e  302
+/ar/illuttration01  https://player.artivive.com/artworks/6a5467ae518e26df36843b0e  302
+/ar/illuttration02  https://player.artivive.com/artworks/6a546861518e26df36843c93  302
+/ar/illuttration03  https://player.artivive.com/artworks/6a546ae9518e26df36844530  302
+/ar/illuttration04  https://player.artivive.com/artworks/6a5464bb518e26df36843436  302
+/ar/illuttration05  https://player.artivive.com/artworks/69a64c9aee4d360782d1fc81  302
+/ar/illuttration06  https://player.artivive.com/artworks/696aea9184b60d4576b02b2a  302
+/ar/illuttration07  https://player.artivive.com/artworks/69637631dede66f382eecf4d  302
+/ar/illuttration08  https://player.artivive.com/artworks/69d74d0285a156cf9d7543e6  302
+/ar/illuttration09  https://player.artivive.com/artworks/69fc291085a156cf9de9ba50  302
+/ar/illuttration10  https://player.artivive.com/artworks/6a22898385a156cf9d63b5c2  302
+/ar/illuttration11  https://player.artivive.com/artworks/6a5466c5518e26df368438d1  302
+/ar/shirasi01  https://player.artivive.com/artworks/697ac5f8929f569139ad64d3  302
+/ar/syashin01  https://player.artivive.com/artworks/6a546520518e26df368434f9  302
+/ar/shasinn02  https://player.artivive.com/artworks/6a544d16518e26df3683f812  302
+/ar/chirasi04  https://player.artivive.com/artworks/6a546064518e26df3684293b  302
+/ar/meishi04  https://player.artivive.com/artworks/68e70cf1ad2a00cc13035bd9  302
+/ar/meishi05  https://player.artivive.com/artworks/69abf035ee4d360782e3bc1d  302
+/ar/meishi16  https://player.artivive.com/artworks/6a58663b518e26df368f813a  302
+/ar/meishi18  https://player.artivive.com/artworks/69b8ef82ee4d3607820add38  302
