@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>参加クリエイター一覧 | GORO DESIGN</title>
+<meta name="description" content="GORO DESIGNに参加するイラストレーター・デザイナー一覧。ARコンテンツ制作を手がけるクリエイターをご紹介します。大阪を中心に全国対応。">
+<meta name="keywords" content="動く名刺,動くデザイン,AR名刺,イラストレーター 大阪,動くポスター,クリエイター 紹介,ゴローデザイン">
+<meta property="og:title" content="参加クリエイター一覧 | GORO DESIGN">
+<meta property="og:description" content="GORO DESIGNに参加するイラストレーター・デザイナー一覧。ARコンテンツ制作を手がけるクリエイターをご紹介します。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://goro-design.jp/goro_creators.html">
+<meta property="og:image" content="https://goro-design.jp/images/case1_after.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--black:#0f0f0e;--white:#fafaf8;--g1:#f0efe9;--g2:#d4d1ca;--g3:#8a877f;--g4:#5a5855;--green:#1e5c4e;--green-l:#d6ede6;--bd:2px solid #d4d1ca;--bd-dark:2px solid #0f0f0e;--sans:'Noto Sans JP',sans-serif;--serif:'Shippori Mincho',serif;--w:1040px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--white);color:var(--black);font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;font-weight:500}
+  nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;background:var(--white);border-bottom:var(--bd)}
+  .logo{font-family:var(--serif);font-size:16px;letter-spacing:.12em;text-decoration:none;color:var(--black);font-weight:600}
+  .nav-links{display:flex;align-items:center;gap:24px}
+  .nav-link{font-size:13px;color:var(--g4);text-decoration:none}.nav-link:hover{color:var(--black)}
+  .nav-link.on{color:var(--black);font-weight:500}
+  .sec{padding:72px 40px}.inn{max-width:var(--w);margin:0 auto}
+  .sec-ey{font-size:11px;letter-spacing:.22em;color:var(--g3);display:block;margin-bottom:10px;font-weight:400}
+  .sec-h{font-family:var(--serif);font-size:26px;font-weight:600;margin-bottom:10px}
+  .sec-sub{font-size:14px;color:var(--g4);line-height:1.9;font-weight:500;margin-bottom:44px}
+  /* FILTER BAR */
+  .filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+  .filter-btn{font-size:11px;letter-spacing:.1em;padding:7px 16px;border:var(--bd-dark);background:var(--white);color:var(--black);cursor:pointer;font-family:var(--sans);font-weight:500;transition:all .15s}
+  .filter-btn:hover{background:var(--g1)}
+  .filter-btn.on{background:var(--black);color:var(--white)}
+
+  /* CREATORS */
+  .cr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:var(--bd-dark);background:var(--g2)}
+  .cr-card{background:var(--white);padding:32px 28px;cursor:pointer;transition:background .15s;position:relative}
+  .cr-card:hover{background:#f5f4ee}
+  .cr-hint{position:absolute;bottom:12px;right:14px;font-size:11px;color:var(--g3);font-weight:500}
+  .pag-btn{width:38px;height:38px;border:var(--bd-dark);background:none;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:400;transition:all .15s}
+  .pag-btn:hover{background:var(--g1)}
+  .pag-btn.on{background:var(--black);color:var(--white);border-color:var(--black)}
+  .cr-type{font-size:11px;letter-spacing:.16em;color:var(--green);margin-bottom:14px;font-weight:500}
+  .cr-avatar{width:64px;height:64px;border-radius:50%;background:var(--g1);border:var(--bd);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;overflow:hidden}
+  .cr-avatar img{width:100%;height:100%;object-fit:cover}
+  .cr-name{font-family:var(--serif);font-size:18px;margin-bottom:14px;font-weight:600}
+  .cr-spec{font-size:12px;color:var(--g4);margin-bottom:18px;line-height:1.7;font-weight:500;white-space:pre-line}
+  .cr-works{display:flex;gap:4px;margin-bottom:16px}
+  .cr-work{width:52px;height:52px;background:var(--g1);border:2px solid var(--g2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--g3)}
+  .cr-work img{width:100%;height:100%;object-fit:cover}
+  /* 依頼ボタン */
+  .cr-inquiry-btn{display:block;width:100%;margin-top:8px;margin-bottom:28px;padding:9px 0;font-size:12px;font-weight:500;background:none;border:var(--bd-dark);color:var(--black);cursor:pointer;font-family:var(--sans);letter-spacing:.06em;transition:all .15s;text-align:center}
+  .cr-inquiry-btn:hover{background:var(--black);color:var(--white)}
+  /* FOOTER */
+  footer{padding:28px 40px;border-top:var(--bd-dark);display:flex;justify-content:space-between;align-items:center}
+  .fl-logo{font-family:var(--serif);font-size:15px;letter-spacing:.1em;font-weight:600}
+  .fl-copy{font-size:12px;color:var(--g3);font-weight:500}
+  /* 共通ナビ */
+  .adminnav{background:#fff;border-bottom:2px solid #1a1a18;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  .adminnav .brand{font-family:var(--serif);font-size:15px;letter-spacing:.12em}
+  .adminnav ul{list-style:none;display:flex;gap:6px;flex-wrap:wrap;margin:0;padding:0}
+  .adminnav a{display:block;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;color:#5a5855;border:1px solid #e0ddd5;background:#fff;transition:.15s}
+  .adminnav a:hover{border-color:#1a1a18;color:#1a1a18}
+  .adminnav a.on{background:#1a1a18;color:#fff;border-color:#1a1a18}
+  .adminnav a.out{border-color:#b0472f;color:#b0472f}
+  .adminnav a.out:hover{background:#b0472f;color:#fff}
+  .savebox{background:#fff8e6;border:1px solid #e0c98a;padding:16px 18px;margin-top:20px;font-size:13px;color:#6b5518;line-height:1.9}
+  .savebox strong{display:block;color:#4a3a0f;margin-bottom:6px}
+  .admin-trigger{font-size:11px;color:var(--g2);background:none;border:none;cursor:pointer;font-family:var(--sans);transition:color .2s;padding:4px 8px}
+  .admin-trigger:hover{color:var(--g3)}
+  /* ADMIN */
+  #admin-panel{display:none;background:#f7f6f2;color:#1a1a18;padding:72px 40px}
+  .admin-inn{max-width:860px;margin:0 auto}
+  .admin-h{font-family:var(--serif);font-size:22px;color:#1a1a18;margin-bottom:6px;font-weight:600}
+  .admin-sub{font-size:13px;color:#5a5855;margin-bottom:32px;font-weight:400;line-height:1.8}
+  .arow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .arow1{margin-bottom:16px}
+  .albl{display:block;font-size:11px;color:#5a5855;margin-bottom:6px;font-weight:600}
+  .ainput,.atextarea{width:100%;font-size:14px;padding:10px 12px;border:1px solid #cfccc4;background:#fff;color:#1a1a18;font-family:var(--sans);outline:none;border-radius:0}
+  .ainput:focus,.atextarea:focus{border-color:#1e5c4e;box-shadow:0 0 0 2px rgba(30,92,78,.12)}
+  .ainput::placeholder,.atextarea::placeholder{color:#a5a29a}
+  .atextarea{height:72px;resize:none}
+  .avatar-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+  .avatar-btn{width:80px;height:80px;border-radius:50%;border:2px dashed #cfccc4;background:#fff;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s}
+  .avatar-btn:hover{border-color:#1e5c4e}
+  .avatar-btn.has-img{border-style:solid;border-color:#1e5c4e}
+  .avatar-btn img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+  .avatar-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .avatar-btn span{font-size:24px;pointer-events:none}
+  .avatar-note{font-size:12px;color:#7a7770;line-height:1.7}
+  .work-pickers{display:flex;gap:8px;margin-top:4px}
+  .work-btn{flex:1;aspect-ratio:1;border:2px dashed #cfccc4;background:#fff;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
+  .work-btn:hover{border-color:#1e5c4e}
+  .work-btn.has-img{border-style:solid;border-color:#1e5c4e}
+  .work-btn img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;pointer-events:none;user-select:none;-webkit-user-drag:none;transform-origin:center;will-change:transform}
+  .work-btn img.preview.fit{object-fit:contain}
+  .work-btn.has-img{cursor:grab}
+  .work-btn.has-img:active{cursor:grabbing}
+  .work-btn.dragging{border-color:#1e5c4e;border-style:solid}
+  .work-hint{position:absolute;bottom:0;left:0;right:0;background:rgba(15,15,14,.72);color:#fff;font-size:10px;text-align:center;padding:3px 2px;z-index:2;pointer-events:none;display:none;letter-spacing:.02em}
+  .work-zoom{display:none;align-items:center;gap:6px;margin-top:5px}
+  .work-zoom.on{display:flex}
+  .work-zoom input[type=range]{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:#d4d1ca;outline:none;border-radius:2px;cursor:pointer}
+  .work-zoom input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#1e5c4e;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #1e5c4e}
+  .work-zoom input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#1e5c4e;cursor:pointer;border:2px solid #fff}
+  .work-zoom .zl{font-size:10px;color:#8a877f;flex-shrink:0;min-width:30px;text-align:right;font-variant-numeric:tabular-nums}
+  .fit-btn{display:none;width:100%;margin-top:4px;padding:5px 4px;font-size:10px;font-weight:600;font-family:var(--sans);background:#fff;border:1px solid #cfccc4;color:#5a5855;cursor:pointer;transition:.15s;letter-spacing:.02em}
+  .fit-btn:hover{border-color:#1e5c4e;color:#1e5c4e}
+  .fit-btn.on{display:block}
+  .fit-btn.active{background:#1e5c4e;color:#fff;border-color:#1e5c4e}
+  .work-col{display:flex;flex-direction:column;flex:1}
+  .has-img .work-hint{display:block}
+  .work-btn.dragging .work-hint{background:#1e5c4e}
+  .work-reset{position:absolute;top:4px;left:4px;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.92);border:1px solid #5a5855;color:#5a5855;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:3;pointer-events:all;line-height:1}
+  .has-img .work-reset{display:flex}
+  .work-reset:hover{background:#1a1a18;color:#fff;border-color:#1a1a18}
+  .work-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:1}
+  /* 画像が入ったら input は無効化（ドラッグ後の誤クリックを防ぐ） */
+  .work-btn.has-img input[type=file]{pointer-events:none;display:none}
+  .work-swap{position:absolute;top:4px;right:28px;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.92);border:1px solid #5a5855;color:#5a5855;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:4;pointer-events:all;line-height:1;padding:0}
+  .has-img .work-swap{display:flex}
+  .work-swap:hover{background:#1e5c4e;color:#fff;border-color:#1e5c4e}
+  .work-btn span.plus{font-size:18px;color:#a5a29a;pointer-events:none}
+  .pick-clear{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.92);border:1px solid #b0472f;color:#b0472f;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:3;pointer-events:all;line-height:1}
+  .has-img .pick-clear{display:flex}
+  .asave-btn{padding:12px 32px;font-size:14px;font-weight:600;background:#1a1a18;color:#fff;border:none;cursor:pointer;font-family:var(--sans);transition:background .15s;margin-top:8px}
+  .asave-btn:hover{background:#1e5c4e}
+  .edit-mode-bar{display:none;background:#fff8e6;border:1px solid #e0c98a;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#8a6a1f;border-radius:0}
+  .cancel-btn{margin-left:12px;padding:12px 20px;font-size:13px;background:#fff;border:1px solid #1a1a18;color:#1a1a18;cursor:pointer;font-family:var(--sans)}
+  .cancel-btn:hover{background:#f0efe9}
+  .entry-list{display:flex;flex-direction:column;gap:6px;margin-top:16px}
+  .entry-item{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e0ddd5;padding:10px 14px;transition:border-color .15s}
+  .entry-item:hover{border-color:#1e5c4e}
+  .entry-thumb{width:40px;height:40px;object-fit:cover;flex-shrink:0;background:#f0efe9;border-radius:50%}
+  .entry-name{font-size:13px;color:#1a1a18;flex:1}.entry-sub{font-size:11px;color:#8a877f}
+  .adel-btn{background:#fff;border:1px solid #b0472f;color:#b0472f;font-size:11px;padding:4px 10px;cursor:pointer;font-family:var(--sans);flex-shrink:0}
+  .adel-btn:hover{background:#b0472f;color:#fff}
+  .core-badge{font-size:10px;color:#1e5c4e;border:1px solid #1e5c4e;padding:2px 6px;margin-left:6px}
+  .divider{font-size:12px;color:#5a5855;margin:24px 0 8px;font-weight:600}
+  .close-admin-btn{margin-top:32px;font-size:13px;color:#5a5855;background:#fff;border:1px solid #cfccc4;padding:8px 20px;cursor:pointer;font-family:var(--sans)}
+  .close-admin-btn:hover{border-color:#1a1a18;color:#1a1a18}
+  .toast{position:fixed;bottom:32px;right:32px;background:#1e5c4e;color:#fff;padding:12px 20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+  .toast.show{opacity:1}
+
+  /* ===== INQUIRY MODAL ===== */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal-box{background:var(--white);max-width:520px;width:100%;padding:40px 36px;position:relative}
+  .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--g3);line-height:1}
+  .modal-close:hover{color:var(--black)}
+  .modal-ey{font-size:11px;letter-spacing:.22em;color:var(--g3);display:block;margin-bottom:8px;font-weight:400}
+  .modal-h{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:6px}
+  .modal-sub{font-size:13px;color:var(--g4);margin-bottom:28px;line-height:1.7}
+  .modal-field{margin-bottom:16px}
+  .modal-label{display:block;font-size:11px;color:var(--g3);margin-bottom:6px;letter-spacing:.08em;font-weight:500}
+  .modal-input,.modal-textarea{width:100%;font-size:14px;padding:11px 14px;border:var(--bd);background:var(--white);font-family:var(--sans);outline:none;color:var(--black);border-radius:0;-webkit-appearance:none}
+  .modal-input:focus,.modal-textarea:focus{border-color:var(--black)}
+  .modal-textarea{height:100px;resize:none}
+  .modal-send{width:100%;padding:14px;font-size:14px;font-weight:500;background:var(--black);color:var(--white);border:none;cursor:pointer;font-family:var(--sans);margin-top:8px;transition:opacity .15s}
+  .modal-send:hover{opacity:.8}
+  .modal-note{font-size:11px;color:var(--g3);margin-top:10px;text-align:center}
+  .modal-done{display:none;text-align:center;padding:20px 0}
+  .modal-done p{font-size:14px;color:var(--g4);line-height:1.8}
+
+  @media(max-width:768px){
+    nav{padding:0 20px}.sec{padding:48px 20px}
+    .cr-grid{grid-template-columns:1fr}
+    .arow{grid-template-columns:1fr}
+    footer{flex-direction:column;gap:12px;text-align:center}
+    #admin-panel{padding:48px 20px}
+    .modal-box{padding:28px 20px}
+  }
+</style>
+<script>/* goro_data.js があれば読み込む */</script>
+<script src="goro_data.js" onerror=""></script>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo">GORO DESIGN</a>
+  <div class="nav-links">
+    <a href="goro_cases" class="nav-link">事例一覧</a>
+    <a href="goro_creators" class="nav-link on">クリエイター一覧</a>
+    <a href="/" class="nav-link">← トップ</a>
+  </div>
+</nav>
+
+<section class="sec">
+  <div class="inn">
+    <span class="sec-ey">ALL CREATORS</span>
+    <h2 class="sec-h">クリエイター一覧</h2>
+    <p class="sec-sub">名前や写真をクリックすると各クリエイターの詳細ページに飛べます。</p>
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn on" onclick="setFilter('all',this)">すべて</button>
+      <button class="filter-btn" onclick="setFilter('イラストレーター',this)">イラストレーター</button>
+      <button class="filter-btn" onclick="setFilter('キャラクターデザイナー',this)">キャラクターデザイナー</button>
+      <button class="filter-btn" onclick="setFilter('デザイナー',this)">デザイナー</button>
+      <button class="filter-btn" onclick="setFilter('漫画家',this)">漫画家</button>
+      <button class="filter-btn" onclick="setFilter('動画制作',this)">動画制作</button>
+      <button class="filter-btn" onclick="setFilter('アーティスト',this)">アーティスト</button>
+      <button class="filter-btn" onclick="setFilter('ゲームデザイナー',this)">ゲームデザイナー</button>
+      <button class="filter-btn" onclick="setFilter('AIクリエイター',this)">AIクリエイター</button>
+      <button class="filter-btn" onclick="setFilter('その他',this)">その他</button>
+    </div>
+    <div class="cr-grid" id="cr-grid"></div>
+    <div id="pagination" style="display:flex;gap:8px;justify-content:center;margin-top:28px"></div>
+  </div>
+</section>
+
+<footer>
+  <span class="fl-logo">GORO DESIGN</span>
+  <span class="fl-copy">Copyright 2026 gorodesign</span>
+  <button class="admin-trigger" onclick="openAdmin()">管理</button>
+</footer>
+
+<div id="admin-panel">
+  <div class="admin-inn" id="ap-cr-add">
+    <h2 class="admin-h">クリエイターの管理</h2>
+    <p class="admin-sub">画像はクリックして選ぶだけ。自動圧縮して保存されます。<br>登録済みのクリエイターは下の一覧から<strong style="color:#1a1a18">クリックで再編集</strong>できます。</p>
+    <div class="edit-mode-bar" id="edit-mode-bar">✏️ 編集モード：<span id="edit-mode-name"></span></div>
+    <div class="avatar-wrap">
+      <div class="avatar-btn" id="btn-avatar">
+        <span>👤</span>
+        <input type="file" accept="image/*" onchange="pickAvatar(this)">
+      </div>
+      <p class="avatar-note">顔写真をクリックして選ぶ（なくてもOK）<br>
+        <button style="margin-top:6px;font-size:11px;color:#c0392b;background:none;border:1px solid #c0392b;padding:3px 10px;cursor:pointer;font-family:var(--sans)" onclick="clearAvatar()">顔写真を取り消す</button>
+      </p>
+    </div>
+    <div class="arow">
+      <div><label class="albl">ジャンルタグ</label><input class="ainput" id="a-type" placeholder="MANGA / ILLUSTRATION / VIDEO"></div>
+      <div><label class="albl">クリエイター名</label><input class="ainput" id="a-name" placeholder="例：ナガレボシ 獅子"></div>
+    </div>
+    <div class="arow">
+      <div><label class="albl">専門・得意分野（2行まで）</label><textarea class="atextarea" id="a-spec" placeholder="例：科学・技術イラスト&#10;キャラクターデザイン"></textarea></div>
+      <div><label class="albl">自己紹介文（任意）</label><textarea class="atextarea" id="a-bio" placeholder="例：大阪を拠点に活動するイラストレーターです。"></textarea></div>
+    </div>
+    <div class="arow">
+      <div><label class="albl">Instagram URL（任意）</label><input class="ainput" id="a-insta" placeholder="https://instagram.com/xxxx"></div>
+      <div><label class="albl">X(Twitter) URL（任意）</label><input class="ainput" id="a-twitter" placeholder="https://x.com/xxxx"></div>
+    </div>
+    <div class="arow">
+      <div><label class="albl">ポートフォリオ・HP URL（任意）</label><input class="ainput" id="a-link" placeholder="https://example.com"></div>
+      <div></div>
+    </div>
+    <div class="arow1">
+      <label class="albl">作品サムネ（最大3枚・クリックして選ぶ）</label>
+      <div class="work-pickers">
+        <div class="work-col">
+          <div class="work-btn" id="btn-w0"><span class="plus">＋</span><button class="work-reset" title="位置とズームを戻す" onclick="resetWorkPos(event,0)">⌖</button><button class="work-swap" title="画像を差し替える" onclick="swapWork(event,0)">⇅</button><button class="pick-clear" onclick="clearWork(event,0)">×</button><span class="work-hint">ドラッグで位置調整</span><input type="file" accept="image/*" onchange="pickWork(this,0)"></div>
+          <div class="work-zoom" id="zoom-w0">
+            <input type="range" min="50" max="250" step="1" value="100" oninput="onZoom(0, this.value)">
+            <span class="zl" id="zl-w0">100%</span>
+          </div>
+          <button class="fit-btn" id="fit-w0" onclick="toggleFit(0)">全体表示（切れない）</button>
+        </div>
+        <div class="work-col">
+          <div class="work-btn" id="btn-w1"><span class="plus">＋</span><button class="work-reset" title="位置とズームを戻す" onclick="resetWorkPos(event,1)">⌖</button><button class="work-swap" title="画像を差し替える" onclick="swapWork(event,1)">⇅</button><button class="pick-clear" onclick="clearWork(event,1)">×</button><span class="work-hint">ドラッグで位置調整</span><input type="file" accept="image/*" onchange="pickWork(this,1)"></div>
+          <div class="work-zoom" id="zoom-w1">
+            <input type="range" min="50" max="250" step="1" value="100" oninput="onZoom(1, this.value)">
+            <span class="zl" id="zl-w1">100%</span>
+          </div>
+          <button class="fit-btn" id="fit-w1" onclick="toggleFit(1)">全体表示（切れない）</button>
+        </div>
+        <div class="work-col">
+          <div class="work-btn" id="btn-w2"><span class="plus">＋</span><button class="work-reset" title="位置とズームを戻す" onclick="resetWorkPos(event,2)">⌖</button><button class="work-swap" title="画像を差し替える" onclick="swapWork(event,2)">⇅</button><button class="pick-clear" onclick="clearWork(event,2)">×</button><span class="work-hint">ドラッグで位置調整</span><input type="file" accept="image/*" onchange="pickWork(this,2)"></div>
+          <div class="work-zoom" id="zoom-w2">
+            <input type="range" min="50" max="250" step="1" value="100" oninput="onZoom(2, this.value)">
+            <span class="zl" id="zl-w2">100%</span>
+          </div>
+          <button class="fit-btn" id="fit-w2" onclick="toggleFit(2)">全体表示（切れない）</button>
+        </div>
+      </div>
+    </div>
+    <button class="asave-btn" id="save-btn" onclick="saveCreator()">追加する</button>
+    <button class="cancel-btn" id="cancel-btn" style="display:none" onclick="cancelEdit()">キャンセル</button>
+    <p class="divider">▼ 登録済みクリエイター（コアは削除不可）</p>
+    <div class="entry-list" id="manage-list"></div>
+    <div class="savebox">
+      <strong>⚠ この編集内容はまだサイトに反映されていません</strong>
+      いまの変更は、このブラウザの中だけに保存されています。<br>
+      サイトに反映するには、<a href="goro_admin.html" style="color:#8a6a1f;font-weight:600">管理ハブ</a> で「goro_data.js をダウンロード」して、goro_design フォルダに入れ、Netlify にアップロードしてください。
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <a href="goro_admin.html" class="asave-btn" style="text-decoration:none;display:inline-block;margin-top:0">管理ハブでダウンロード →</a>
+      <button class="close-admin-btn" onclick="closeAdmin()" style="margin-top:0">管理を閉じる</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- ===== INQUIRY MODAL ===== -->
+<div class="modal-overlay" id="inquiry-modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModalDirect()">×</button>
+    <span class="modal-ey">INQUIRY</span>
+    <h2 class="modal-h">クリエイターへの依頼</h2>
+    <p class="modal-sub" id="modal-creator-label">内容をご記入ください。ゴローデザインが窓口となってご連絡します。</p>
+    <form id="inquiry-form" action="https://formspree.io/f/xkoydkgb" method="POST" onsubmit="handleInquirySubmit(event)">
+      <input type="hidden" name="件名" id="modal-subject" value="">
+      <div class="modal-field">
+        <label class="modal-label">お名前</label>
+        <input class="modal-input" type="text" name="お名前" placeholder="山田 太郎" required>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">メールアドレス</label>
+        <input class="modal-input" type="email" name="メールアドレス" placeholder="example@mail.com" required>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">依頼内容</label>
+        <textarea class="modal-textarea" name="依頼内容" placeholder="ご依頼の概要をお書きください。" required></textarea>
+      </div>
+      <button class="modal-send" type="submit">送信する →</button>
+      <p class="modal-note">ゴローデザインより2〜3営業日以内にご連絡します</p>
+    </form>
+    <div class="modal-done" id="modal-done">
+      <p>送信しました。<br>2〜3営業日以内にご連絡します。</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== INQUIRY MODAL =====
+function openInquiry(name, e){
+  if(e){e.stopPropagation();}
+  document.getElementById('modal-subject').value = '【クリエイター依頼】' + name;
+  document.getElementById('modal-creator-label').textContent = '「' + name + '」への依頼内容をご記入ください。ゴローデザインが窓口となってご連絡します。';
+  document.getElementById('inquiry-form').style.display = 'block';
+  document.getElementById('modal-done').style.display = 'none';
+  document.getElementById('inquiry-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e){
+  if(e.target === document.getElementById('inquiry-modal')) closeModalDirect();
+}
+function closeModalDirect(){
+  document.getElementById('inquiry-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function handleInquirySubmit(e){
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  try {
+    const res = await fetch(form.action, {method:'POST', body:data, headers:{Accept:'application/json'}});
+    if(res.ok){
+      form.style.display = 'none';
+      document.getElementById('modal-done').style.display = 'block';
+      setTimeout(closeModalDirect, 3000);
+    } else {
+      alert('送信に失敗しました。再度お試しください。');
+    }
+  } catch {
+    alert('送信に失敗しました。再度お試しください。');
+  }
+}
+</script>
+
+<script>
+const CORE=[
+  {type:"イラストレーター",name:"823（はつみ）",spec:"あたたかみのある暮らしイラスト\nグッズ・スタンプ制作",bio:"「帰ってきたくなるような絵」をコンセプトに、あたたかさとやさしさを感じる色使いで作品を制作。家モチーフの世界観が特徴で、SUZURIグッズやLINEスタンプも展開中。",avatar:null,emoji:"🏠",works:[],instagram:"https://www.instagram.com/talo.823/",twitter:"https://twitter.com/talo_823",link:"https://lit.link/hatsumi823",linkText:"portfolio : lit.link/hatsumi823"},
+  {type:"漫画家",name:"クリエイター名",spec:"漫画・4コマ・ストーリー漫画\nキャラクターデザイン",bio:"",avatar:null,emoji:"🎨",works:[],link:null,linkText:""},
+  {type:"イラストレーター",name:"ナガレボシ 獅子",spec:"科学・技術イラスト\nキャラクターデザイン",bio:"",avatar:null,emoji:"🦁",works:[],link:"https://nboshi.art",linkText:"portfolio : nboshi.art"},
+  {type:"動画制作",name:"クリエイター名",spec:"動画制作・モーショングラフィック\nアニメーション",bio:"",avatar:null,emoji:"🎥",works:[],link:null,linkText:""}
+];
+const PW="goro2026",KEY="goro_extra_creators",CORE_KEY="goro_core_cr_edits";
+let tmp={avatar:null,works:[null,null,null]};
+
+/* ── 作品画像：{img,x,y,z} 正規化（旧データの文字列も受け付ける） ── */
+function normWork(w){
+  if(!w) return null;
+  if(typeof w === 'string') return {img:w, x:50, y:50, z:100, fit:false};
+  return {
+    img: w.img,
+    x: (w.x==null ? 50  : w.x),
+    y: (w.y==null ? 50  : w.y),
+    z: (w.z==null ? 100 : w.z),
+    fit: !!w.fit
+  };
+}
+
+/* 画像に位置とズームを適用 */
+function applyWorkPos(i){
+  const w = tmp.works[i];
+  if(!w) return;
+  const btn = document.getElementById('btn-w'+i);
+  const im  = btn && btn.querySelector('img.preview');
+  if(im){
+    im.classList.toggle('fit', !!w.fit);
+    im.style.objectPosition = w.x + '% ' + w.y + '%';
+    im.style.transform      = 'scale(' + (w.z/100) + ')';
+  }
+  const sl = document.querySelector('#zoom-w'+i+' input');
+  const zl = document.getElementById('zl-w'+i);
+  if(sl) sl.value = w.z;
+  if(zl) zl.textContent = w.z + '%';
+  const fb = document.getElementById('fit-w'+i);
+  if(fb){
+    fb.classList.toggle('active', !!w.fit);
+    fb.textContent = w.fit ? '全体表示：オン' : '全体表示（切れない）';
+  }
+}
+
+/* 全体表示のON/OFF */
+function toggleFit(i){
+  const w = tmp.works[i];
+  if(!w) return;
+  w.fit = !w.fit;
+  if(w.fit){ w.z = 100; w.x = 50; w.y = 50; }
+  applyWorkPos(i);
+  toast(w.fit ? '全体表示にしました（切れません）' : '通常表示に戻しました');
+}
+
+/* ズームスライダー */
+function onZoom(i, val){
+  if(!tmp.works[i]) return;
+  tmp.works[i].z = parseInt(val, 10);
+  applyWorkPos(i);
+}
+
+/* 位置とズームをリセット */
+function resetWorkPos(e,i){
+  e.preventDefault(); e.stopPropagation();
+  if(!tmp.works[i]) return;
+  tmp.works[i].x = 50;
+  tmp.works[i].y = 50;
+  tmp.works[i].z = 100;
+  tmp.works[i].fit = false;
+  applyWorkPos(i);
+  toast('位置とズームを戻しました');
+}
+
+/* 画像を差し替える（ボタン経由でのみファイル選択を開く） */
+function swapWork(e,i){
+  e.preventDefault(); e.stopPropagation();
+  const fi = document.querySelector('#btn-w'+i+' input[type=file]');
+  if(!fi) return;
+  fi.style.display='';          // 一時的に有効化
+  fi.style.pointerEvents='all';
+  fi.value='';
+  fi.click();
+  // 選択ダイアログが閉じたら再び無効化（onchange 側でも処理）
+  setTimeout(()=>{
+    if(tmp.works[i]){ fi.style.display='none'; fi.style.pointerEvents='none'; }
+  }, 300);
+}
+
+/* ズームUIの表示切替 */
+function showZoomUI(i, on){
+  const z = document.getElementById('zoom-w'+i);
+  if(z) z.classList.toggle('on', !!on);
+  const f = document.getElementById('fit-w'+i);
+  if(f) f.classList.toggle('on', !!on);
+}
+
+/* ── ドラッグで位置調整 ── */
+function initWorkDrag(i){
+  const btn = document.getElementById('btn-w'+i);
+  if(!btn || btn.dataset.dragReady) return;
+  btn.dataset.dragReady = '1';
+
+  let dragging=false, sx=0, sy=0, bx=50, by=50;
+
+  const start = (cx,cy)=>{
+    if(!tmp.works[i]) return false;
+    if(tmp.works[i].fit) return false;  // 全体表示中は動かさない
+    dragging=true; sx=cx; sy=cy;
+    bx=tmp.works[i].x; by=tmp.works[i].y;
+    btn.classList.add('dragging');
+    return true;
+  };
+  const move = (cx,cy)=>{
+    if(!dragging || !tmp.works[i]) return;
+    const r = btn.getBoundingClientRect();
+    let nx = bx - (cx - sx) / r.width  * 100 * 1.6;
+    let ny = by - (cy - sy) / r.height * 100 * 1.6;
+    nx = Math.max(0, Math.min(100, nx));
+    ny = Math.max(0, Math.min(100, ny));
+    tmp.works[i].x = Math.round(nx);
+    tmp.works[i].y = Math.round(ny);
+    moved = true;
+    applyWorkPos(i);
+  };
+  let moved=false;
+  const end = ()=>{
+    if(dragging && moved){
+      // ドラッグ直後のクリックイベントを1回だけ握りつぶす
+      const swallow = ev => { ev.preventDefault(); ev.stopPropagation(); };
+      btn.addEventListener('click', swallow, {capture:true, once:true});
+      setTimeout(()=>btn.removeEventListener('click', swallow, {capture:true}), 50);
+    }
+    dragging=false; moved=false;
+    btn.classList.remove('dragging');
+  };
+
+  btn.addEventListener('mousedown', e=>{
+    if(e.target.tagName==='BUTTON') return;
+    if(start(e.clientX, e.clientY)) e.preventDefault();
+  });
+  window.addEventListener('mousemove', e=>{ if(dragging){ move(e.clientX,e.clientY); e.preventDefault(); } });
+  window.addEventListener('mouseup', end);
+
+  btn.addEventListener('touchstart', e=>{
+    if(e.target.tagName==='BUTTON') return;
+    const t=e.touches[0];
+    if(start(t.clientX,t.clientY)) e.preventDefault();
+  }, {passive:false});
+  btn.addEventListener('touchmove', e=>{
+    if(!dragging) return;
+    const t=e.touches[0];
+    move(t.clientX,t.clientY); e.preventDefault();
+  }, {passive:false});
+  btn.addEventListener('touchend', end);
+}
+[0,1,2].forEach(initWorkDrag);
+let editIdx=-1, editType=null;
+
+function getExtra(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}}
+function setExtra(a){try{localStorage.setItem(KEY,JSON.stringify(a));return true}catch{alert('保存容量が不足しています。');return false}}
+function getCoreEdits(){try{return JSON.parse(localStorage.getItem(CORE_KEY)||'[]')}catch{return[]}}
+function setCoreEdits(a){localStorage.setItem(CORE_KEY,JSON.stringify(a))}
+function getEffectiveCore(i){const e=getCoreEdits();return e[i]?{...CORE[i],...e[i]}:CORE[i]}
+function v(id){return document.getElementById(id).value.trim()}
+
+async function compress(file){return new Promise(r=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const M=600,ra=Math.min(M/img.naturalWidth,M/img.naturalHeight,1);const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*ra);c.height=Math.round(img.naturalHeight*ra);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',0.72))};img.src=u})}
+
+async function pickAvatar(input){
+  const f=input.files[0];if(!f)return;const d=await compress(f);tmp.avatar=d;
+  const btn=document.getElementById('btn-avatar');btn.classList.add('has-img');
+  let im=btn.querySelector('img.preview');if(!im){im=document.createElement('img');im.className='preview';btn.insertBefore(im,btn.querySelector('input'));}
+  im.src=d;btn.querySelector('span').style.display='none';
+}
+function clearAvatar(){
+  tmp.avatar=null;const btn=document.getElementById('btn-avatar');btn.classList.remove('has-img');
+  const im=btn.querySelector('img.preview');if(im)im.remove();btn.querySelector('span').style.display='';
+  const fi=btn.querySelector('input[type=file]');if(fi)fi.value='';
+}
+async function pickWork(input,i){
+  const f=input.files[0];if(!f)return;const d=await compress(f);
+  tmp.works[i]={img:d, x:50, y:50, z:100, fit:false};
+  const btn=document.getElementById('btn-w'+i);btn.classList.add('has-img');
+  let im=btn.querySelector('img.preview');if(!im){im=document.createElement('img');im.className='preview';btn.insertBefore(im,btn.querySelector('input'));}
+  im.src=d;btn.querySelector('span.plus').style.display='none';
+  input.style.display='none'; input.style.pointerEvents='none';
+  showZoomUI(i, true);
+  applyWorkPos(i);
+  initWorkDrag(i);
+}
+function clearWork(e,i){
+  e.preventDefault();e.stopPropagation();tmp.works[i]=null;
+  const btn=document.getElementById('btn-w'+i);btn.classList.remove('has-img');
+  const im=btn.querySelector('img.preview');if(im)im.remove();btn.querySelector('span.plus').style.display='';
+  const fi=btn.querySelector('input[type=file]');
+  if(fi){ fi.value=''; fi.style.display=''; fi.style.pointerEvents='all'; }
+  showZoomUI(i, false);
+  const sl=document.querySelector('#zoom-w'+i+' input'); if(sl) sl.value=100;
+  const zl=document.getElementById('zl-w'+i); if(zl) zl.textContent='100%';
+}
+
+function resetForm(){
+  ['a-type','a-name','a-spec','a-bio','a-insta','a-twitter','a-link'].forEach(i=>document.getElementById(i).value='');
+  clearAvatar();[0,1,2].forEach(i=>clearWork({preventDefault:()=>{},stopPropagation:()=>{}},i));
+}
+function saveCreator(){
+  if(!v('a-name')){alert('名前を入力してください');return}
+  const link=v('a-link'),works=tmp.works.filter(Boolean).map(normWork);
+  const existing=editIdx>=0?(editType==='core'?getEffectiveCore(editIdx):getExtra()[editIdx]):null;
+  const newData={
+    type:v('a-type')||'ILLUSTRATION',name:v('a-name'),spec:v('a-spec'),bio:v('a-bio'),
+    instagram:v('a-insta'),twitter:v('a-twitter'),
+    avatar:tmp.avatar||(existing?existing.avatar:null),
+    emoji:tmp.avatar?null:(existing?existing.emoji:'✏️'),
+    works:works.length?works:(existing?existing.works:[]),
+    link:link||null,linkText:link?'portfolio : '+link.replace(/https?:\/\//,''):''
+  };
+  if(editIdx>=0){
+    if(editType==='core'){const edits=getCoreEdits();edits[editIdx]=newData;setCoreEdits(edits);}
+    else{const arr=getExtra();arr[editIdx]=newData;if(!setExtra(arr))return;}
+    toast('更新しました ✓');
+  } else {
+    const arr=getExtra();arr.push(newData);if(!setExtra(arr))return;
+    toast('クリエイターを追加しました ✓');
+  }
+  cancelEdit();renderAll();renderManage();
+}
+function editCreator(type,i){
+  const c=type==='core'?getEffectiveCore(i):getExtra()[i];
+  if(!c)return;
+  editIdx=i;editType=type;
+  document.getElementById('a-type').value=c.type||'';
+  document.getElementById('a-name').value=c.name||'';
+  document.getElementById('a-spec').value=c.spec||'';
+  document.getElementById('a-bio').value=c.bio||'';
+  document.getElementById('a-insta').value=c.instagram||'';
+  document.getElementById('a-twitter').value=c.twitter||'';
+  document.getElementById('a-link').value=c.link||'';
+  if(c.avatar){
+    tmp.avatar=c.avatar;
+    const btn=document.getElementById('btn-avatar');btn.classList.add('has-img');
+    let im=btn.querySelector('img.preview');if(!im){im=document.createElement('img');im.className='preview';btn.appendChild(im);}
+    im.src=c.avatar;btn.querySelector('span').style.display='none';
+  }
+  (c.works||[]).forEach((w,idx)=>{
+    const nw = normWork(w);
+    if(!nw)return;
+    tmp.works[idx]=nw;
+    const btn=document.getElementById('btn-w'+idx);btn.classList.add('has-img');
+    let im=btn.querySelector('img.preview');if(!im){im=document.createElement('img');im.className='preview';btn.insertBefore(im,btn.querySelector('input'));}
+    im.src=nw.img;btn.querySelector('span.plus').style.display='none';
+    const fi=btn.querySelector('input[type=file]');
+    if(fi){ fi.style.display='none'; fi.style.pointerEvents='none'; }
+    showZoomUI(idx, true);
+    applyWorkPos(idx);
+    initWorkDrag(idx);
+  });
+  document.getElementById('edit-mode-bar').style.display='block';
+  document.getElementById('edit-mode-name').textContent=c.name+(type==='core'?' (コア)':'');
+  document.getElementById('save-btn').textContent='更新する';
+  document.getElementById('cancel-btn').style.display='inline-block';
+  document.getElementById('ap-cr-add').scrollIntoView({behavior:'smooth'});
+}
+function cancelEdit(){
+  editIdx=-1;editType=null;resetForm();
+  document.getElementById('edit-mode-bar').style.display='none';
+  document.getElementById('save-btn').textContent='追加する';
+  document.getElementById('cancel-btn').style.display='none';
+}
+function delCreator(i){const a=getExtra();a.splice(i,1);setExtra(a);if(editIdx===i&&editType==='extra'){cancelEdit();}renderAll();renderManage();toast('削除しました')}
+
+function viewCreator(type,idx){
+  const c=type==='core'?getEffectiveCore(idx):getExtra()[idx];
+  if(!c)return;
+  localStorage.setItem('goro_viewing_creator',JSON.stringify(c));
+  window.location.href='goro_creator_detail.html';
+}
+
+const PER_PAGE=6;
+let curPage=1;
+
+function crHTML(c,type,idx){
+  const av=c.avatar?`<div class="cr-avatar"><img src="${c.avatar}"></div>`:`<div class="cr-avatar">${c.emoji||'👤'}</div>`;
+  const ws=c.works&&c.works.length?c.works.slice(0,3).map(w=>{const n=normWork(w);return `<div class="cr-work"><img src="${n.img}" style="object-fit:${n.fit?'contain':'cover'};object-position:${n.x}% ${n.y}%;transform:scale(${n.z/100})" loading="lazy"></div>`;}).join(''):'<div class="cr-work">作</div><div class="cr-work">品</div><div class="cr-work">例</div>';
+  return `<div class="cr-card" onclick="viewCreator('${type}',${idx})">${av}<p class="cr-type">${c.type}</p><p class="cr-name">${c.name}</p><p class="cr-spec">${c.spec||''}</p><div class="cr-works">${ws}</div><button class="cr-inquiry-btn" onclick="openInquiry('${c.name.replace(/'/g,"\\'")}', event)">このクリエイターに依頼する</button><span class="cr-hint">詳細を見る →</span></div>`;
+}
+
+let currentFilter = 'all';
+
+function setFilter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  curPage = 1;
+  renderAll();
+}
+
+function renderAll(){
+  const coreItems=CORE.map((_,i)=>({c:getEffectiveCore(i),t:'core',i}));
+  const all=[...coreItems,...getExtra().map((c,i)=>({c,t:'extra',i}))];
+  const filtered = currentFilter === 'all' ? all : all.filter(({c}) => c.type === currentFilter);
+  const total=filtered.length,pages=Math.ceil(total/PER_PAGE);
+  if(curPage>pages)curPage=1;
+  const start=(curPage-1)*PER_PAGE;
+  document.getElementById('cr-grid').innerHTML=filtered.slice(start,start+PER_PAGE).map(({c,t,i})=>crHTML(c,t,i)).join('') || '<p style="font-size:13px;color:var(--g3);padding:40px 0">該当するクリエイターはまだいません。</p>';
+  const pg=document.getElementById('pagination');
+  if(pages<=1){pg.innerHTML='';return}
+  pg.innerHTML=Array.from({length:pages},(_,i)=>`<button class="pag-btn${i+1===curPage?' on':''}" onclick="goPage(${i+1})">${i+1}</button>`).join('');
+}
+function goPage(n){curPage=n;renderAll();window.scrollTo({top:0,behavior:'smooth'})}
+
+function renderManage(){
+  const ek=getExtra();
+  const th=(img)=>img?`<img class="entry-thumb" src="${img}">`:`<div class="entry-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;background:#222;border-radius:50%">👤</div>`;
+  document.getElementById('manage-list').innerHTML=
+    CORE.map((c,i)=>{const ec=getEffectiveCore(i);return`<div class="entry-item" style="cursor:pointer" onclick="editCreator('core',${i})">${th(ec.avatar)}<div class="entry-name" style="flex:1"><span style="color:#1a1a18">${ec.name}</span><span class="core-badge">コア</span><div class="entry-sub">${ec.type}</div></div><span style="font-size:11px;color:#8a877f">✏️ 編集</span></div>`}).join('')+
+    ek.map((c,i)=>`<div class="entry-item" style="cursor:pointer" onclick="editCreator('extra',${i})">${th(c.avatar)}<div class="entry-name" style="flex:1"><span style="color:#1a1a18">${c.name}</span><div class="entry-sub">${c.type}</div></div><span style="font-size:11px;color:#8a877f;margin-right:8px">✏️ 編集</span><button class="adel-btn" onclick="event.stopPropagation();delCreator(${i})">削除</button></div>`).join('')+
+    (!ek.length?'<p style="font-size:12px;color:#8a877f;padding:8px 0">追加されたクリエイターはまだいません</p>':'');
+}
+const AUTH='goro_admin_auth';
+function showAdmin(){document.getElementById('admin-panel').style.display='block';renderManage();}
+function openAdmin(){
+  if(localStorage.getItem(AUTH)==='1'){showAdmin();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});return;}
+  const pw=prompt('管理パスワード');
+  if(pw===PW){localStorage.setItem(AUTH,'1');showAdmin();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});}
+  else if(pw!==null)alert('パスワードが違います');
+}
+function closeAdmin(){document.getElementById('admin-panel').style.display='none';window.scrollTo({top:0,behavior:'smooth'})}
+function doLogout(){localStorage.removeItem(AUTH);location.reload();}
+// 管理画面から遷移してきた場合は自動で開く
+if(localStorage.getItem(AUTH)==='1'){document.addEventListener('DOMContentLoaded',()=>{showAdmin();});}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+renderAll();
+
+// URLパラメーターからフィルターを自動適用
+const urlFilter = new URLSearchParams(window.location.search).get('filter');
+if(urlFilter) {
+  const btn = [...document.querySelectorAll('.filter-btn')].find(b => b.textContent === urlFilter);
+  if(btn) setFilter(urlFilter, btn);
+}
+</script>
+</body>
+</html>

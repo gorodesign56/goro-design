@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>キャラクター管理｜ゴローデザイン</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;600;700;900&family=Zen+Old+Mincho:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#1a1a18; --white:#fff; --g1:#f4f2ed; --g2:#e5e2da; --g3:#8a8780; --g4:#4a4845;
+    --green:#3f6b52; --red:#b0472f;
+    --sans:"Zen Kaku Gothic New",sans-serif; --serif:"Zen Old Mincho",serif;
+    --bd:1px solid var(--g2); --bd-dark:2px solid var(--black);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--black);background:var(--g1);line-height:1.6;padding:0 0 80px}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 16px}
+
+  /* 共通ナビ */
+  .adminnav{background:var(--white);border-bottom:var(--bd-dark);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:50}
+  .adminnav .brand{font-family:var(--serif);font-size:15px;letter-spacing:.12em}
+  .adminnav ul{list-style:none;display:flex;gap:6px;flex-wrap:wrap}
+  .adminnav a{display:block;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;color:var(--g4);border:1px solid var(--g2);background:var(--white);transition:.15s}
+  .adminnav a:hover{border-color:var(--black);color:var(--black)}
+  .adminnav a.on{background:var(--black);color:var(--white);border-color:var(--black)}
+  .adminnav a.out{border-color:var(--red);color:var(--red)}
+  .adminnav a.out:hover{background:var(--red);color:var(--white)}
+
+  header{margin-bottom:24px}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--green);font-weight:600;margin-bottom:6px}
+  h1{font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:8px}
+  .lead{font-size:13px;color:var(--g4)}
+  .card{background:var(--white);border:var(--bd-dark);padding:22px;margin-bottom:20px}
+  .card h2{font-family:var(--serif);font-size:17px;margin-bottom:4px}
+  .card .sub{font-size:12px;color:var(--g3);margin-bottom:16px}
+
+  /* ログイン */
+  #login{max-width:380px;margin:80px auto}
+  #login input{width:100%;padding:12px;border:var(--bd);font-size:15px;margin-bottom:12px;font-family:var(--sans);background:var(--white)}
+  .btn{padding:12px 22px;border:var(--bd-dark);background:var(--black);color:var(--white);font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+  .btn:hover{background:var(--green);border-color:var(--green)}
+  .btn-sub{background:var(--white);color:var(--black)}
+  .btn-sub:hover{background:var(--g1);color:var(--black);border-color:var(--black)}
+  .btn-del{background:var(--white);color:var(--red);border:1px solid var(--red);padding:7px 14px;font-size:12px;cursor:pointer;font-family:var(--sans);font-weight:600}
+  .btn-del:hover{background:var(--red);color:var(--white)}
+  .btn-sm{padding:7px 14px;font-size:12px}
+  .err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+
+  /* フォーム */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  @media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+  .fld label{display:block;font-size:12px;font-weight:600;margin-bottom:5px;color:var(--g4)}
+  .fld input,.fld select{width:100%;padding:10px;border:var(--bd);font-size:14px;font-family:var(--sans);background:var(--white)}
+  .fld input:focus,.fld select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px rgba(63,107,82,.12)}
+  .fld .hint{font-size:11px;color:var(--g3);margin-top:4px}
+
+  /* 画像ピッカー */
+  .pick-wrap{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+  .pick-btn{width:110px;height:140px;border:2px dashed var(--g2);background:var(--white);cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s}
+  .pick-btn:hover{border-color:var(--green)}
+  .pick-btn.has-img{border-style:solid;border-color:var(--green)}
+  .pick-btn img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;background:var(--white)}
+  .pick-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .pick-btn span.plus{font-size:26px;color:var(--g3);pointer-events:none}
+  .pick-note{font-size:12px;color:var(--g4);line-height:1.8}
+  .pick-note strong{display:block;font-size:13px;color:var(--black);margin-bottom:4px}
+  .chk-row{display:flex;gap:16px;flex-wrap:wrap;padding:9px 0 2px}
+  .chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--black)}
+  .chk input{width:16px;height:16px;cursor:pointer;accent-color:var(--green)}
+  .pick-btn video.vpreview{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;background:var(--white)}
+  .tag-move{display:inline-block;font-size:10px;padding:3px 7px;border:1px solid var(--green);color:var(--green);background:#eaf3ee;margin-right:3px;font-weight:600}
+  .tag-vid{display:inline-block;font-size:10px;padding:3px 7px;background:var(--black);color:var(--white);margin-left:3px;font-weight:600}
+
+  /* 一覧 */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--black);color:var(--white);text-align:left;padding:10px;font-weight:600;font-size:12px}
+  td{border-bottom:var(--bd);padding:10px;vertical-align:middle}
+  tr:hover td{background:var(--g1)}
+  .thumb{width:44px;height:55px;object-fit:contain;border:var(--bd);background:var(--white);display:block}
+  .thumb-none{width:44px;height:55px;border:var(--bd);background:var(--g1);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--g3)}
+  .tag{display:inline-block;font-size:10px;padding:3px 8px;background:var(--g1);border:var(--bd);margin-right:4px}
+  .tag-green{background:var(--green);color:var(--white);border-color:var(--green)}
+  .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .empty{text-align:center;padding:40px;color:var(--g3);font-size:13px}
+
+  /* 保存案内 */
+  .savebox{background:#fff8e6;border:1px solid #e0c98a;padding:16px 18px;margin-top:14px;font-size:13px;color:#6b5518;line-height:1.9}
+  .savebox strong{display:block;font-size:13px;color:#4a3a0f;margin-bottom:6px}
+  .steps{background:var(--g1);border-left:3px solid var(--green);padding:14px 16px;margin-top:14px;font-size:13px}
+  .steps ol{margin-left:18px}
+  .steps li{margin:5px 0}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:var(--white);padding:13px 26px;font-size:14px;font-weight:600;transition:transform .3s;z-index:99}
+  .toast.on{transform:translateX(-50%) translateY(0)}
+  .editing{background:#fffbf0 !important;border-left:3px solid var(--green)}
+</style>
+</head>
+<body>
+
+<!-- ログイン -->
+<div id="login" class="card">
+  <div class="eyebrow">ADMIN</div>
+  <h2 style="font-family:var(--serif);font-size:19px;margin-bottom:14px">キャラクター管理</h2>
+  <input type="password" id="pw" placeholder="パスワード" onkeydown="if(event.key==='Enter')doLogin()">
+  <button class="btn" style="width:100%" onclick="doLogin()">ログイン</button>
+  <p class="err" id="loginErr">パスワードが違います</p>
+</div>
+
+<!-- 本体 -->
+<div id="app" style="display:none">
+
+  <nav class="adminnav">
+    <span class="brand">GORO DESIGN</span>
+    <ul>
+      <li><a href="goro_admin.html">管理ハブ</a></li>
+      <li><a href="goro_cases.html">事例</a></li>
+      <li><a href="goro_creators.html">クリエイター</a></li>
+      <li><a href="goro_characters.html" class="on">キャラクター</a></li>
+      <li><a href="index.html">← サイトを見る</a></li>
+      <li><a href="#" class="out" onclick="doLogout();return false">ログアウト</a></li>
+    </ul>
+  </nav>
+
+  <div class="wrap">
+  <header>
+    <div class="eyebrow">CHARACTER ADMIN</div>
+    <h1>キャラクター管理</h1>
+    <p class="lead">サイトの「キャラクター選択」に表示するキャラを管理します。画像はクリックして選ぶだけ。編集が終わったら管理ハブでダウンロードしてください。</p>
+  </header>
+
+  <!-- 追加/編集フォーム -->
+  <div class="card" id="formCard">
+    <h2 id="formTitle">キャラクターを追加</h2>
+    <p class="sub" id="formSub">必要な項目を入力して「追加する」を押してください。</p>
+
+    <!-- 画像ピッカー -->
+    <div class="pick-wrap">
+      <div class="pick-btn" id="pickBtn">
+        <span class="plus">＋</span>
+        <img class="preview" id="preview" style="display:none">
+        <input type="file" accept="image/*" id="fFile" onchange="onPick(event)">
+      </div>
+      <div class="pick-note">
+        <strong>キャラクター画像をクリックして選ぶ</strong>
+        白背景か透過PNGがおすすめです。<br>
+        自動で圧縮して保存されます（なくてもOK・「準備中」表示になります）。<br>
+        <button class="btn-del" style="margin-top:8px" onclick="clearPick()">画像を取り消す</button>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="fld">
+        <label>キャラクター名 <span style="color:var(--red)">*</span></label>
+        <input type="text" id="fName" placeholder="例：ゴローくん">
+      </div>
+      <div class="fld">
+        <label>提供者（クレジット表記）</label>
+        <input type="text" id="fBy" placeholder="例：提供：〇〇さん">
+        <div class="hint">空欄なら「提供：Coming Soon」になります</div>
+      </div>
+      <div class="fld">
+        <label>種類 <span style="color:var(--red)">*</span></label>
+        <select id="fType">
+          <option value="イラスト">イラスト</option>
+          <option value="実写">実写</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>対応する動き方 <span style="color:var(--red)">*</span></label>
+        <div class="chk-row">
+          <label class="chk"><input type="checkbox" id="fMove2D" checked><span>平面的に動く</span></label>
+          <label class="chk"><input type="checkbox" id="fMove3D"><span>立体的に飛び出す</span></label>
+        </div>
+        <div class="hint">両方できるキャラは両方にチェック。1体のカードにまとめて表示されます。</div>
+      </div>
+    </div>
+    <!-- 動画ピッカー -->
+    <div class="pick-wrap" style="margin-top:4px">
+      <div class="pick-btn" id="vidBtn">
+        <span class="plus">🎬</span>
+        <video class="vpreview" id="vpreview" style="display:none" autoplay loop muted playsinline></video>
+        <input type="file" accept="video/webm,video/mp4" id="fVid" onchange="onPickVideo(event)">
+      </div>
+      <div class="pick-note">
+        <strong>動く動画（任意・透過WebM推奨）</strong>
+        キャラ選択の上位4体は、この動画が自動でループ再生されます。<br>
+        <span style="color:var(--red);font-weight:600">※ 3MB以下・5〜8秒・音声なし</span> にしてください。<br>
+        未設定なら静止画のまま表示されます。
+        <button class="btn-del" style="margin-top:8px" onclick="clearVideo()">動画を取り消す</button>
+      </div>
+    </div>
+
+    <div class="acts">
+      <button class="btn" id="btnSave" onclick="saveChar()">追加する</button>
+      <button class="btn btn-sub btn-sm" id="btnCancel" onclick="cancelEdit()" style="display:none">編集をやめる</button>
+    </div>
+  </div>
+
+  <!-- 一覧 -->
+  <div class="card">
+    <h2>登録キャラクター一覧</h2>
+    <p class="sub" id="countTxt">0件</p>
+    <table>
+      <thead>
+        <tr><th style="width:60px">画像</th><th>名前</th><th style="width:150px">提供者</th><th style="width:170px">種類・動き方</th><th style="width:150px">操作</th></tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg" style="display:none">まだキャラクターが登録されていません。</div>
+
+    <div class="savebox">
+      <strong>⚠ この編集内容はまだサイトに反映されていません</strong>
+      いまの変更は、このブラウザの中だけに保存されています。<br>
+      サイトに反映するには、<a href="goro_admin.html" style="color:#8a6a1f;font-weight:600">管理ハブ</a> で「goro_data.js をダウンロード」して、Netlify にアップロードしてください。
+    </div>
+
+    <div class="steps">
+      <strong style="font-size:13px">サイトに反映する手順</strong>
+      <ol>
+        <li>上のナビから <strong>管理ハブ</strong> を開く</li>
+        <li>「goro_data.js をダウンロード」を押す</li>
+        <li>ダウンロードした goro_data.js を <code>goro_design</code> フォルダに入れる（上書き）</li>
+        <li><code>goro_design</code> フォルダごと Netlify にドラッグ＆ドロップ</li>
+      </ol>
+      <p style="margin-top:8px;color:var(--g3);font-size:12px">※ デプロイはクレジットを使うので、事例・クリエイター・キャラをまとめて編集してから1回で上げてください。</p>
+    </div>
+
+    <div class="acts" style="margin-top:14px">
+      <a href="goro_admin.html" class="btn" style="text-decoration:none;display:inline-block">管理ハブでダウンロード →</a>
+      <button class="btn btn-sub btn-sm" onclick="resetAll()">最初の状態に戻す</button>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PW = "goro2026";
+const KEY = "goro_characters_v1";
+const AUTH = "goro_admin_auth";
+
+const DEFAULT_CHARS = [
+  {name:"ゴローくん", by:"gallery goro", type:"イラスト", moves:["平面","立体"], img:"images/char_goro.png", video:"images/char_goro.webm"},
+  {name:"ゴローネコ", by:"gallery goro", type:"イラスト", moves:["平面","立体"], img:"images/char_goroneko.png", video:"images/char_goroneko.webm"},
+  {name:"キャスター1", by:"gallery goro", type:"実写", moves:["平面","立体"], img:"images/char_caster1.png", video:"images/char_caster1.webm"},
+  {name:"キャラクター4", by:"提供：Coming Soon", type:"イラスト", moves:["平面"], img:"", video:""},
+];
+let chars = [];
+let editIdx = -1;
+let pickedImg = "";
+let pickedVid = "";
+
+/* 旧形式(move:"平面") → 新形式(moves:["平面"]) に正規化 */
+function normChar(c){
+  if(!c) return null;
+  let moves = Array.isArray(c.moves) ? c.moves.slice() : (c.move ? [c.move] : []);
+  moves = moves.filter(m => m==="平面" || m==="立体");
+  if(moves.length===0) moves = ["平面"];
+  moves.sort((a,b)=> a==="平面" ? -1 : 1);
+  return {
+    name: c.name||"", by: c.by||"提供：Coming Soon", type: c.type||"イラスト",
+    moves: moves, img: c.img||"", video: c.video||""
+  };
+}
+
+/* ── ログイン（3画面共通） ── */
+function doLogin(){
+  const v = document.getElementById('pw').value;
+  if(v === PW){
+    localStorage.setItem(AUTH,'1');
+    showApp();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+function doLogout(){
+  localStorage.removeItem(AUTH);
+  location.reload();
+}
+function showApp(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  load();
+}
+if(localStorage.getItem(AUTH)==='1') showApp();
+
+/* ── 画像圧縮（透過PNG保持） ── */
+function compress(file){
+  return new Promise(res=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      const MAX = 700;
+      const ra = Math.min(MAX/img.naturalWidth, MAX/img.naturalHeight, 1);
+      const c = document.createElement('canvas');
+      c.width  = Math.round(img.naturalWidth * ra);
+      c.height = Math.round(img.naturalHeight * ra);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      // PNGなら透過を保持、それ以外はJPEGで軽量化
+      const isPng = /\.png$/i.test(file.name) || file.type === 'image/png';
+      res(c.toDataURL(isPng ? 'image/png' : 'image/jpeg', 0.8));
+    };
+    img.src = url;
+  });
+}
+
+/* 動画：圧縮せずそのまま（透過を壊さないため）。3MB制限 */
+function onPickVideo(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const MAX = 3 * 1024 * 1024;
+  if(f.size > MAX){
+    alert('動画が大きすぎます（' + (f.size/1024/1024).toFixed(1) + 'MB）。\n3MB以下にしてください。\n\n※ 5〜8秒・音声なし・透過WebM を推奨します。');
+    e.target.value = '';
+    return;
+  }
+  const r = new FileReader();
+  r.onload = () => {
+    pickedVid = r.result;
+    showVideoPreview();
+    toast('動画を読み込みました');
+  };
+  r.readAsDataURL(f);
+}
+function showVideoPreview(){
+  const btn = document.getElementById('vidBtn');
+  const pv  = document.getElementById('vpreview');
+  if(pickedVid){
+    pv.src = pickedVid; pv.style.display='block';
+    btn.classList.add('has-img');
+    btn.querySelector('span.plus').style.display='none';
+  } else {
+    pv.removeAttribute('src'); pv.style.display='none';
+    btn.classList.remove('has-img');
+    btn.querySelector('span.plus').style.display='';
+  }
+}
+function clearVideo(){
+  pickedVid = "";
+  document.getElementById('fVid').value = '';
+  showVideoPreview();
+  toast('動画を取り消しました');
+}
+
+async function onPick(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  toast('画像を処理中...');
+  pickedImg = await compress(f);
+  showPreview();
+  toast('画像を読み込みました');
+}
+function showPreview(){
+  const btn = document.getElementById('pickBtn');
+  const pv  = document.getElementById('preview');
+  if(pickedImg){
+    pv.src = pickedImg;
+    pv.style.display = 'block';
+    btn.classList.add('has-img');
+  } else {
+    pv.style.display = 'none';
+    btn.classList.remove('has-img');
+  }
+}
+function clearPick(){
+  pickedImg = "";
+  document.getElementById('fFile').value = '';
+  showPreview();
+  toast('画像を取り消しました');
+}
+
+/* ── データ ── */
+function load(){
+  let raw;
+  try{
+    const s = localStorage.getItem(KEY);
+    raw = s ? JSON.parse(s) : DEFAULT_CHARS.slice();
+  }catch(e){ raw = DEFAULT_CHARS.slice(); }
+  // 正規化＋同名（同種類）は1体に統合
+  const out=[], idx={};
+  raw.forEach(r=>{
+    const c = normChar(r);
+    if(!c || !c.name) return;
+    const key = c.type+"::"+c.name;
+    if(idx[key]===undefined){ idx[key]=out.length; out.push(c); }
+    else {
+      const e = out[idx[key]];
+      c.moves.forEach(m=>{ if(!e.moves.includes(m)) e.moves.push(m); });
+      if(!e.img && c.img) e.img = c.img;
+      if(!e.video && c.video) e.video = c.video;
+      if((!e.by || e.by==="提供：Coming Soon") && c.by) e.by = c.by;
+    }
+  });
+  out.forEach(c=>c.moves.sort((a,b)=> a==="平面" ? -1 : 1));
+  chars = out;
+  render();
+}
+function persist(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(chars));
+  }catch(e){
+    alert('保存できませんでした。画像が大きすぎる可能性があります。\n枚数を減らすか、画像を小さくしてください。');
+  }
+  render();
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function render(){
+  const tb = document.getElementById('listBody');
+  const empty = document.getElementById('emptyMsg');
+  document.getElementById('countTxt').textContent = chars.length + "件";
+  if(chars.length===0){ tb.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tb.innerHTML = chars.map((c,i)=>{
+    const img = c.img
+      ? `<img class="thumb" src="${esc(c.img)}" alt="">`
+      : `<div class="thumb-none">なし</div>`;
+    const L = {"平面":"平面的に動く","立体":"立体的に飛び出す"};
+    const moveTags = (c.moves||[]).map(m=>`<span class="tag-move">${L[m]}</span>`).join('');
+    const vidTag = c.video ? '<span class="tag-vid">🎬 動画あり</span>' : '';
+    return `<tr class="${i===editIdx?'editing':''}">
+      <td>${img}</td>
+      <td><strong>${esc(c.name)}</strong>${vidTag}</td>
+      <td style="font-size:12px;color:var(--g3)">${esc(c.by||'提供：Coming Soon')}</td>
+      <td><span class="tag tag-green">${esc(c.type)}</span><br>${moveTags}</td>
+      <td><div class="acts">
+        <button class="btn btn-sub btn-sm" onclick="editChar(${i})">編集</button>
+        <button class="btn-del" onclick="delChar(${i})">削除</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function saveChar(){
+  const name = document.getElementById('fName').value.trim();
+  if(!name){ toast('キャラクター名を入力してください'); return; }
+  const moves = [];
+  if(document.getElementById('fMove2D').checked) moves.push("平面");
+  if(document.getElementById('fMove3D').checked) moves.push("立体");
+  if(moves.length === 0){ toast('動き方を1つ以上選んでください'); return; }
+  const obj = {
+    name: name,
+    by:   document.getElementById('fBy').value.trim() || "提供：Coming Soon",
+    type: document.getElementById('fType').value,
+    moves: moves,
+    img:  pickedImg,
+    video: pickedVid
+  };
+  if(editIdx >= 0){ chars[editIdx] = obj; toast('編集を保存しました'); }
+  else { chars.push(obj); toast('キャラクターを追加しました'); }
+  cancelEdit();
+  persist();
+}
+function editChar(i){
+  editIdx = i;
+  const c = chars[i];
+  document.getElementById('fName').value = c.name;
+  document.getElementById('fBy').value   = c.by || '';
+  document.getElementById('fType').value = c.type;
+  document.getElementById('fMove2D').checked = c.moves.includes("平面");
+  document.getElementById('fMove3D').checked = c.moves.includes("立体");
+  pickedImg = c.img || "";
+  pickedVid = c.video || "";
+  showPreview();
+  showVideoPreview();
+  document.getElementById('formTitle').textContent = 'キャラクターを編集';
+  document.getElementById('formSub').textContent = '「' + c.name + '」を編集しています。';
+  document.getElementById('btnSave').textContent = '保存する';
+  document.getElementById('btnCancel').style.display = 'inline-block';
+  document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+  render();
+}
+function cancelEdit(){
+  editIdx = -1;
+  ['fName','fBy'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value='イラスト';
+  document.getElementById('fMove2D').checked = true;
+  document.getElementById('fMove3D').checked = false;
+  document.getElementById('fFile').value='';
+  document.getElementById('fVid').value='';
+  pickedImg = "";
+  pickedVid = "";
+  showPreview();
+  showVideoPreview();
+  document.getElementById('formTitle').textContent = 'キャラクターを追加';
+  document.getElementById('formSub').textContent = '必要な項目を入力して「追加する」を押してください。';
+  document.getElementById('btnSave').textContent = '追加する';
+  document.getElementById('btnCancel').style.display = 'none';
+  render();
+}
+function delChar(i){
+  if(!confirm('「' + chars[i].name + '」を削除しますか？')) return;
+  chars.splice(i,1);
+  if(editIdx===i) cancelEdit();
+  toast('削除しました');
+  persist();
+}
+function resetAll(){
+  if(!confirm('最初の状態（サンプル5件）に戻します。よろしいですか？')) return;
+  chars = DEFAULT_CHARS.slice();
+  cancelEdit();
+  toast('初期状態に戻しました');
+  persist();
+}
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'), 2200);
+}
+</script>
+</body>
+</html>
