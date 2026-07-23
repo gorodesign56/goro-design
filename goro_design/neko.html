@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ゴロー猫と話す</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  h1 { font-size: 18px; margin: 16px 0 12px; }
+  #log {
+    background: #16213e;
+    border-radius: 16px;
+    padding: 16px;
+    width: 100%;
+    max-width: 560px;
+    min-height: 200px;
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px;
+  }
+  .me, .cat { margin-bottom: 12px; line-height: 1.6; font-size: 15px; }
+  .me { color: #7ec8e3; }
+  .cat { color: #ffd166; }
+  #btn {
+    font-size: 18px;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 999px;
+    background: #e94560;
+    color: white;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #btn:disabled { background: #555; }
+  #status { margin-top: 12px; color: #888; font-size: 14px; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>ゴロー猫と話す</h1>
+<div id="log"></div>
+<button id="btn">押しながら話す</button>
+<div id="status">準備OK</div>
+
+<script>
+const logEl = document.getElementById('log');
+const btn = document.getElementById('btn');
+const statusEl = document.getElementById('status');
+let history = [];
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) {
+  statusEl.textContent = 'Chromeで開いてください';
+  btn.disabled = true;
+}
+const recognition = SR ? new SR() : null;
+if (recognition) {
+  recognition.lang = 'ja-JP';
+  recognition.interimResults = false;
+}
+
+function addLine(who, text) {
+  const div = document.createElement('div');
+  div.className = who;
+  div.textContent = (who === 'me' ? 'あなた：' : 'ゴロー猫：') + text;
+  logEl.appendChild(div);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function startListening() {
+  if (!recognition) return;
+  statusEl.textContent = '聞いています…';
+  recognition.start();
+}
+function stopListening() {
+  if (!recognition) return;
+  recognition.stop();
+}
+
+btn.addEventListener('mousedown', startListening);
+btn.addEventListener('mouseup', stopListening);
+btn.addEventListener('touchstart', e => { e.preventDefault(); startListening(); });
+btn.addEventListener('touchend', e => { e.preventDefault(); stopListening(); });
+
+recognition && (recognition.onresult = async (e) => {
+  const text = e.results[0][0].transcript;
+  addLine('me', text);
+  statusEl.textContent = '考えています…';
+  btn.disabled = true;
+
+  try {
+    const chatRes = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, history })
+    });
+    const { reply } = await chatRes.json();
+    addLine('cat', reply);
+    history.push({ role: 'user', content: text });
+    history.push({ role: 'assistant', content: reply });
+
+    statusEl.textContent = '声を作っています…';
+
+    const ttsRes = await fetch('/api/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: reply })
+    });
+
+    if (ttsRes.ok) {
+      statusEl.textContent = '準備OK';
+      const sampleRate = 24000;
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate });
+      let nextTime = audioCtx.currentTime;
+      let buffer = new Uint8Array(0);
+      const CHUNK_SAMPLES = 4096;
+
+      function playPcmChunk(pcmBytes) {
+        const int16 = new Int16Array(pcmBytes.buffer, pcmBytes.byteOffset, Math.floor(pcmBytes.byteLength / 2));
+        const float32 = new Float32Array(int16.length);
+        for (let i = 0; i < int16.length; i++) float32[i] = int16[i] / 32768;
+        const audioBuf = audioCtx.createBuffer(1, float32.length, sampleRate);
+        audioBuf.copyToChannel(float32, 0);
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuf;
+        source.connect(audioCtx.destination);
+        const startTime = Math.max(nextTime, audioCtx.currentTime + 0.05);
+        source.start(startTime);
+        nextTime = startTime + audioBuf.duration;
+      }
+
+      const reader = ttsRes.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) { if (buffer.length >= 2) playPcmChunk(buffer); break; }
+        const merged = new Uint8Array(buffer.length + value.length);
+        merged.set(buffer); merged.set(value, buffer.length);
+        buffer = merged;
+        const byteSize = CHUNK_SAMPLES * 2;
+        while (buffer.length >= byteSize) {
+          playPcmChunk(buffer.slice(0, byteSize));
+          buffer = buffer.slice(byteSize);
+        }
+      }
+    } else {
+      statusEl.textContent = '音声エラー';
+    }
+  } catch (err) {
+    statusEl.textContent = 'エラー：' + err.message;
+  }
+  btn.disabled = false;
+});
+
+recognition && (recognition.onerror = (e) => {
+  statusEl.textContent = '音声認識エラー：' + e.error;
+  btn.disabled = false;
+});
+</script>
+</body>
+</html>
