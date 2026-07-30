@@ -41,6 +41,14 @@
   .ar-dot{position:absolute;top:10px;right:10px;font-size:10px;letter-spacing:.1em;padding:3px 8px;background:var(--black);color:var(--white);font-weight:500}
   .video-link-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.85);color:var(--white);font-size:12px;padding:9px 14px;text-decoration:none;font-weight:500;letter-spacing:.04em;display:block;text-align:center;transition:background .15s}
   .video-link-btn:hover{background:rgba(0,0,0,1)}
+  /* トップと同じ「クリックでその場再生」用 */
+  .case-img .case-img-clickable{width:100%;height:100%;object-fit:contain}
+  .case-img .case-img-clickable img{width:100%;height:100%;object-fit:contain;background:var(--white)}
+  .case-img-clickable{cursor:pointer;border:none;padding:0;width:100%;display:block;background:none;position:relative;transition:opacity .15s}
+  .case-img-clickable:hover{opacity:.88}
+  .case-img-clickable:hover ~ .ar-dot{background:var(--green);transform:scale(1.06)}
+  .ar-dot{transition:background .15s, transform .15s}
+  .case-img-clickable:focus-visible{outline:3px solid var(--black);outline-offset:2px}
   .case-caption{padding:12px 14px;font-size:12px;color:var(--g4);line-height:1.7;font-weight:500;display:flex;align-items:flex-start;gap:6px}
   .chk{color:var(--green);font-size:13px;margin-top:1px;flex-shrink:0}
   .arr-col{display:flex;align-items:center;justify-content:center;border-left:2px solid var(--g2);border-right:2px solid var(--g2);font-size:16px;color:var(--g3)}
@@ -179,8 +187,8 @@
     </div>
     <div class="arow1" style="border:1px solid #2a2a28;padding:14px;margin-bottom:16px">
       <label class="albl" style="color:#1a1a18;margin-bottom:8px">🎬 After ARを動画にする場合（任意）</label>
-      <input class="ainput" id="a-avideo" placeholder="YouTubeのURLを貼り付け（例：https://youtu.be/xxxx）">
-      <p style="font-size:11px;color:#8a877f;margin-top:5px">※ YouTubeのURLを入力すると、After ARが動画プレーヤーになります。画像と動画URLの両方がある場合は動画が優先されます。</p>
+      <input class="ainput" id="a-avideo" placeholder="動画ファイル名（例：images/case5_video.mp4）または YouTubeのURL">
+      <p style="font-size:11px;color:#8a877f;margin-top:5px">※ 動画ファイル名（例：images/case5_video.mp4）を入れると、After AR画像をタップしてその場で再生できます。<br>※ YouTubeのURL（https://youtu.be/xxxx）を入れた場合は、従来通り別タブで開きます。<br>※ 画像と動画の両方がある場合は動画が優先されます。</p>
     </div>
     <button class="asave-btn" id="save-btn" onclick="saveCase()">追加する</button>
     <button class="cancel-edit-btn" id="cancel-btn" style="display:none" onclick="cancelEdit()">キャンセル</button>
@@ -301,10 +309,35 @@ function cancelEdit(){
   const cb=document.getElementById('cancel-btn');if(cb)cb.style.display='none';
 }
 function delCase(i){const a=getExtra();a.splice(i,1);setExtra(a);if(editIdx===i&&editType==='extra'){cancelEdit();}renderAll();renderManage();toast('削除しました')}
+function isYouTube(url){return /youtu\.be|youtube\.com/i.test(url||'');}
 function afterMedia(c){
   const img=`<img src="${c.afterImg}" loading="lazy">`;
-  if(c.afterVideo) return img+`<a href="${c.afterVideo}" target="_blank" class="video-link-btn">▶ 動画を見る →</a>`;
+  if(c.afterVideo){
+    if(isYouTube(c.afterVideo)){
+      // YouTubeのURL：従来通り別タブで開く
+      return img+`<a href="${c.afterVideo}" target="_blank" class="video-link-btn">▶ 動画を見る →</a>`;
+    }
+    // mp4など自前動画：クリックでその場再生（トップと同じ）
+    return `<button type="button" class="case-img-clickable" onclick="playInline(this, '${c.afterVideo}')" aria-label="${c.client}の動画を再生"><img src="${c.afterImg}" alt="After" loading="lazy"></button><span class="ar-dot">▶</span>`;
+  }
   return img;
+}
+function playInline(btn, src){
+  const container=btn.parentElement;
+  const dot=container.querySelector('.ar-dot');
+  if(dot) dot.remove();
+  const video=document.createElement('video');
+  video.src=src;
+  video.controls=true;
+  video.playsInline=true;
+  video.style.width='100%';
+  video.style.height='100%';
+  video.style.objectFit='contain';
+  video.style.background='#000';
+  video.style.display='block';
+  video.onerror=()=>{video.onerror=null;alert('この動画はまだ準備中です。もうしばらくお待ちください。');};
+  btn.replaceWith(video);
+  video.play().catch(()=>{});
 }
 function caseHTML(c){
   return `<div class="case-card">
@@ -312,7 +345,7 @@ function caseHTML(c){
     <div class="case-ba">
       <div><div class="case-side-lbl">Before</div><div class="case-img"><img src="${c.beforeImg}" loading="lazy"></div><div class="case-caption">${c.beforeLabel}</div></div>
       <div class="arr-col">→</div>
-      <div><div class="case-side-lbl al">After AR</div><div class="case-img" style="position:relative">${afterMedia(c)}${!c.afterVideo?'<span class="ar-dot">▶ AR</span>':''}</div><div class="case-caption"><span class="chk">✓</span><span>${c.afterLabel}</span></div></div>
+      <div><div class="case-side-lbl al">After AR</div><div class="case-img" style="position:relative">${afterMedia(c)}${!c.afterVideo?'<span class="ar-dot">▶</span>':''}</div><div class="case-caption"><span class="chk">✓</span><span>${c.afterLabel}</span></div></div>
     </div>
   </div>`
 }
@@ -349,3 +382,4 @@ renderAll();
 </script>
 </body>
 </html>
+
