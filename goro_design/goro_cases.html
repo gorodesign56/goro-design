@@ -218,7 +218,7 @@
           <label class="albl" style="margin-top:6px">または YouTube URL</label>
           <input class="ainput" id="a-avideo" placeholder="https://youtu.be/xxxx（任意）">
         </div>
-        <p style="font-size:11px;color:#8a877f;margin-top:8px">※ 動画を選ぶと、MOVなどブラウザで再生しづらい形式は自動的にweb用mp4へ変換します（大きい動画は変換に時間がかかります）。<br>※ 画像と動画の両方がある場合は動画が優先されます（画像はサムネイルになります）。</p>
+        <p style="font-size:11px;color:#8a877f;margin-top:8px">※ 動画は <strong>MP4（H.264）・約48MBまで</strong> に対応します（CapCutの標準書き出しでOK）。<br>※ iPhoneのMOVや大きい動画は、mp4で書き出して選び直すか、下の <strong>YouTube URL</strong> をお使いください。<br>※ 画像と動画の両方がある場合は動画が優先されます（画像はサムネイルになります）。</p>
       </div>
       <button class="asave-btn" id="save-btn" onclick="saveCase()">追加する</button>
       <button class="cancel-edit-btn" id="cancel-btn" style="display:none" onclick="cancelEdit()">キャンセル</button>
@@ -344,73 +344,42 @@ function showPickPreview(key, src){
   ov.textContent='クリックで変更';
 }
 
-/* ====== 動画：必要なら ffmpeg.wasm でmp4へ変換 ====== */
-function setVidStatus(msg,cls){const el=document.getElementById('vid-status');el.textContent=msg||'';el.className='vid-status'+(cls?' '+cls:'');}
-function setVidProgress(p){const b=document.getElementById('vid-progress');if(p==null){b.style.display='none';b.querySelector('i').style.width='0';return;}b.style.display='block';b.querySelector('i').style.width=Math.round(p*100)+'%';}
-
-const GOOD_BRANDS=['isom','mp41','mp42','iso2','iso4','iso5','iso6','avc1','dash','M4V ','mmp4'];
-async function needsConversion(file){
-  const name=(file.name||'').toLowerCase();
-  if(/\.(mov|avi|mkv|webm|m4v|3gp|wmv|flv)$/.test(name)) return true;
-  let brand='';
-  try{const head=new Uint8Array(await file.slice(0,12).arrayBuffer());brand=String.fromCharCode.apply(null,head.slice(8,12));}catch(e){}
-  const goodBrand=GOOD_BRANDS.includes(brand);
-  const canPlay=await new Promise(r=>{
-    const vid=document.createElement('video'),u=URL.createObjectURL(file);
-    vid.muted=true;vid.src=u;
-    vid.onloadeddata=()=>{URL.revokeObjectURL(u);r(true);};
-    vid.onerror=()=>{URL.revokeObjectURL(u);r(false);};
-    setTimeout(()=>{try{URL.revokeObjectURL(u);}catch(e){}r(false);},8000);
+/* ====== 動画：Webで再生できるmp4のみ受け付ける（サイズ上限あり） ====== */
+function setVidStatus(msg,cls){const el=document.getElementById('vid-status');if(el){el.textContent=msg||'';el.className='vid-status'+(cls?' '+cls:'');}}
+function setVidProgress(){const b=document.getElementById('vid-progress');if(b)b.style.display='none';}
+const MAX_VIDEO_MB=48;
+function canBrowserPlay(file){
+  return new Promise(res=>{
+    const v=document.createElement('video');
+    v.preload='metadata'; v.muted=true;
+    v.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px';
+    const u=URL.createObjectURL(file);
+    let done=false; const fin=ok=>{if(done)return;done=true;try{URL.revokeObjectURL(u);}catch(e){}v.remove();res(ok);};
+    v.onloadedmetadata=()=>fin((v.videoWidth||0)>0);
+    v.onerror=()=>fin(false);
+    setTimeout(()=>fin(false),9000);
+    v.src=u; document.body.appendChild(v);
   });
-  return !(goodBrand && canPlay);
-}
-let _ffmpeg=null;
-function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('読込失敗:'+src));document.head.appendChild(s);});}
-async function getFFmpeg(){
-  if(_ffmpeg) return _ffmpeg;
-  if(!window.FFmpegWASM) await loadScript('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js');
-  if(!window.FFmpegUtil) await loadScript('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js');
-  const {FFmpeg}=window.FFmpegWASM;
-  const {toBlobURL}=window.FFmpegUtil;
-  const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
-  const ff=new FFmpeg();
-  await ff.load({
-    coreURL: await toBlobURL(base+'/ffmpeg-core.js','text/javascript'),
-    wasmURL: await toBlobURL(base+'/ffmpeg-core.wasm','application/wasm')
-  });
-  _ffmpeg=ff; return ff;
-}
-async function convertToMp4(file){
-  const ff=await getFFmpeg();
-  const {fetchFile}=window.FFmpegUtil;
-  ff.on('progress',({progress})=>{if(progress>=0&&progress<=1)setVidProgress(progress);});
-  await ff.writeFile('in', await fetchFile(file));
-  await ff.exec(['-i','in','-vf','scale=\'min(1280,iw)\':-2','-c:v','libx264','-preset','veryfast','-crf','26','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart','out.mp4']);
-  const data=await ff.readFile('out.mp4');
-  return new Blob([data.buffer],{type:'video/mp4'});
 }
 async function pickVideo(input){
-  const f=input.files[0]; if(!f){tmp.avideo=null;setVidStatus('');setVidProgress(null);return;}
+  const f=input.files[0];
+  if(!f){tmp.avideo=null;setVidStatus('');return;}
+  const ext=(f.name.split('.').pop()||'').toLowerCase();
+  const sizeMB=f.size/1048576;
   setVidStatus('動画を確認中…','busy');
-  try{
-    const conv=await needsConversion(f);
-    if(conv){
-      setVidStatus('web用mp4に変換中…（大きい動画は数分かかることがあります）','busy');
-      setVidProgress(0);
-      const blob=await convertToMp4(f);
-      setVidProgress(null);
-      tmp.avideo={blob,ext:'mp4'};
-      setVidStatus('変換できました ✓（保存で反映されます）','ok');
-    }else{
-      tmp.avideo={blob:f,ext:'mp4'};
-      setVidStatus('動画OK ✓（そのままweb再生できます）','ok');
-    }
-  }catch(e){
-    console.error(e);
-    setVidProgress(null);
-    tmp.avideo={blob:f,ext:(f.name.split('.').pop()||'mp4')};
-    setVidStatus('⚠ 自動変換できませんでした。元の動画のまま保存します（PCで再生できない場合はmp4で書き出して選び直してください）','err');
+  const playable=await canBrowserPlay(f);
+  if(!playable){
+    tmp.avideo=null; input.value='';
+    setVidStatus('⚠ この動画（'+ext.toUpperCase()+'）はWebページで再生できない形式です。CapCutなどで「MP4（H.264）」で書き出してから選び直すか、下のYouTube URLをお使いください。','err');
+    return;
   }
+  if(sizeMB>MAX_VIDEO_MB){
+    tmp.avideo=null; input.value='';
+    setVidStatus('⚠ 動画が大きすぎます（'+sizeMB.toFixed(0)+'MB／上限'+MAX_VIDEO_MB+'MB）。短くする・書き出し画質を下げて選び直すか、長い動画はYouTube URLをお使いください。','err');
+    return;
+  }
+  tmp.avideo={blob:f, ext:(ext||'mp4')};
+  setVidStatus('動画OK ✓（'+sizeMB.toFixed(1)+'MB）保存すると反映されます','ok');
 }
 
 /* ====== Storage アップロード ====== */
