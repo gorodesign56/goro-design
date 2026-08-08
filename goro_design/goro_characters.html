@@ -95,6 +95,7 @@
   .toast.on{transform:translateX(-50%) translateY(0)}
   .editing{background:#fffbf0 !important;border-left:3px solid var(--green)}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -209,26 +210,9 @@
     </table>
     <div class="empty" id="emptyMsg" style="display:none">まだキャラクターが登録されていません。</div>
 
-    <div class="savebox">
-      <strong>⚠ この編集内容はまだサイトに反映されていません</strong>
-      いまの変更は、このブラウザの中だけに保存されています。<br>
-      サイトに反映するには、<a href="goro_admin.html" style="color:#8a6a1f;font-weight:600">管理ハブ</a> で「goro_data.js をダウンロード」して、Netlify にアップロードしてください。
-    </div>
-
-    <div class="steps">
-      <strong style="font-size:13px">サイトに反映する手順</strong>
-      <ol>
-        <li>上のナビから <strong>管理ハブ</strong> を開く</li>
-        <li>「goro_data.js をダウンロード」を押す</li>
-        <li>ダウンロードした goro_data.js を <code>goro_design</code> フォルダに入れる（上書き）</li>
-        <li><code>goro_design</code> フォルダごと Netlify にドラッグ＆ドロップ</li>
-      </ol>
-      <p style="margin-top:8px;color:var(--g3);font-size:12px">※ デプロイはクレジットを使うので、事例・クリエイター・キャラをまとめて編集してから1回で上げてください。</p>
-    </div>
-
-    <div class="acts" style="margin-top:14px">
-      <a href="goro_admin.html" class="btn" style="text-decoration:none;display:inline-block">管理ハブでダウンロード →</a>
-      <button class="btn btn-sub btn-sm" onclick="resetAll()">最初の状態に戻す</button>
+    <div class="savebox" style="background:#e7f3ee;border-color:#9fccbd;color:#1e5c4e">
+      <strong style="color:#154438">✓ 変更はすぐにサイトへ反映されます</strong>
+      キャラクターのデータと画像・動画は Supabase に保存されます。goro_data.js のダウンロードやデプロイ作業は不要です。
     </div>
   </div>
   </div>
@@ -237,280 +221,212 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PW = "goro2026";
-const KEY = "goro_characters_v1";
-const AUTH = "goro_admin_auth";
+/* ====== Supabase 設定 ====== */
+const SUPABASE_URL='https://lcqkgqzdscqhjuyokqvg.supabase.co';
+const SUPABASE_KEY='sb_publishable_r8frHUI_SuPtFa0La0hUuQ_8UqFuQ79';
+const ADMIN_EMAIL='gorodesign56@gmail.com';
+const BUCKET='case-media';
+let SB=null;
 
-const DEFAULT_CHARS = [
-  {name:"ゴローくん", by:"gallery goro", type:"イラスト", moves:["平面","立体"], img:"images/char_goro.png", video:"images/char_goro.webm"},
-  {name:"ゴローネコ", by:"gallery goro", type:"イラスト", moves:["平面","立体"], img:"images/char_goroneko.png", video:"images/char_goroneko.webm"},
-  {name:"キャスター1", by:"gallery goro", type:"実写", moves:["平面","立体"], img:"images/char_caster1.png", video:"images/char_caster1.webm"},
-  {name:"キャラクター4", by:"提供：Coming Soon", type:"イラスト", moves:["平面"], img:"", video:""},
-];
-let chars = [];
-let editIdx = -1;
-let pickedImg = "";
-let pickedVid = "";
+let chars = [];          // {id, sort_order, name, by, type, moves, img, video}
+let editId = null, editCurrent = null;
+let pickedImg = null, removeImg = false;   // pickedImg={blob,ext,url}
+let pickedVid = null, removeVid = false;
 
-/* 旧形式(move:"平面") → 新形式(moves:["平面"]) に正規化 */
-function normChar(c){
-  if(!c) return null;
-  let moves = Array.isArray(c.moves) ? c.moves.slice() : (c.move ? [c.move] : []);
-  moves = moves.filter(m => m==="平面" || m==="立体");
-  if(moves.length===0) moves = ["平面"];
-  moves.sort((a,b)=> a==="平面" ? -1 : 1);
-  return {
-    name: c.name||"", by: c.by||"提供：Coming Soon", type: c.type||"イラスト",
-    moves: moves, img: c.img||"", video: c.video||""
-  };
-}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('on'); setTimeout(()=>el.classList.remove('on'),2200); }
 
-/* ── ログイン（3画面共通） ── */
-function doLogin(){
-  const v = document.getElementById('pw').value;
-  if(v === PW){
-    localStorage.setItem(AUTH,'1');
-    showApp();
-  } else {
-    document.getElementById('loginErr').style.display='block';
-  }
+/* ── ログイン（パスワードのみ） ── */
+async function doLogin(){
+  const pw = document.getElementById('pw').value;
+  const {error} = await SB.auth.signInWithPassword({email:ADMIN_EMAIL, password:pw});
+  if(error){ document.getElementById('loginErr').style.display='block'; }
+  else { document.getElementById('loginErr').style.display='none'; document.getElementById('pw').value=''; showApp(); }
 }
-function doLogout(){
-  localStorage.removeItem(AUTH);
-  location.reload();
-}
+async function doLogout(){ if(SB) await SB.auth.signOut(); location.reload(); }
 function showApp(){
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='block';
   load();
 }
-if(localStorage.getItem(AUTH)==='1') showApp();
+async function boot(){
+  if(!window.supabase){ alert('接続に失敗しました。再読み込みしてください。'); return; }
+  SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const { data:{ session } } = await SB.auth.getSession();
+  if(session) showApp();
+}
+document.addEventListener('DOMContentLoaded', boot);
 
-/* ── 画像圧縮（透過PNG保持） ── */
-function compress(file){
-  return new Promise(res=>{
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = ()=>{
-      const MAX = 700;
-      const ra = Math.min(MAX/img.naturalWidth, MAX/img.naturalHeight, 1);
-      const c = document.createElement('canvas');
-      c.width  = Math.round(img.naturalWidth * ra);
-      c.height = Math.round(img.naturalHeight * ra);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+/* ── アップロード ── */
+async function uploadToStorage(blob, ext, sub){
+  const path = sub + '/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+  const { error } = await SB.storage.from(BUCKET).upload(path, blob, {contentType:blob.type||undefined, upsert:false});
+  if(error) throw error;
+  return SB.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+/* ── 画像（透過PNG保持・圧縮してBlob化） ── */
+function compressToBlob(file){
+  return new Promise((res,rej)=>{
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const MAX=700, ra=Math.min(MAX/img.naturalWidth,MAX/img.naturalHeight,1);
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.naturalWidth*ra); c.height=Math.round(img.naturalHeight*ra);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
       URL.revokeObjectURL(url);
-      // PNGなら透過を保持、それ以外はJPEGで軽量化
-      const isPng = /\.png$/i.test(file.name) || file.type === 'image/png';
-      res(c.toDataURL(isPng ? 'image/png' : 'image/jpeg', 0.8));
+      const isPng=/\.png$/i.test(file.name)||file.type==='image/png';
+      c.toBlob(b=>b?res({blob:b,ext:isPng?'png':'jpg'}):rej(new Error('圧縮失敗')), isPng?'image/png':'image/jpeg', 0.85);
     };
-    img.src = url;
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('画像を読めません'));};
+    img.src=url;
   });
 }
-
-/* 動画：圧縮せずそのまま（透過を壊さないため）。3MB制限 */
-function onPickVideo(e){
-  const f = e.target.files[0];
-  if(!f) return;
-  const MAX = 3 * 1024 * 1024;
-  if(f.size > MAX){
-    alert('動画が大きすぎます（' + (f.size/1024/1024).toFixed(1) + 'MB）。\n3MB以下にしてください。\n\n※ 5〜8秒・音声なし・透過WebM を推奨します。');
-    e.target.value = '';
-    return;
-  }
-  const r = new FileReader();
-  r.onload = () => {
-    pickedVid = r.result;
-    showVideoPreview();
-    toast('動画を読み込みました');
-  };
-  r.readAsDataURL(f);
-}
-function showVideoPreview(){
-  const btn = document.getElementById('vidBtn');
-  const pv  = document.getElementById('vpreview');
-  if(pickedVid){
-    pv.src = pickedVid; pv.style.display='block';
-    btn.classList.add('has-img');
-    btn.querySelector('span.plus').style.display='none';
-  } else {
-    pv.removeAttribute('src'); pv.style.display='none';
-    btn.classList.remove('has-img');
-    btn.querySelector('span.plus').style.display='';
-  }
-}
-function clearVideo(){
-  pickedVid = "";
-  document.getElementById('fVid').value = '';
-  showVideoPreview();
-  toast('動画を取り消しました');
-}
-
 async function onPick(e){
-  const f = e.target.files[0];
-  if(!f) return;
+  const f=e.target.files[0]; if(!f) return;
   toast('画像を処理中...');
-  pickedImg = await compress(f);
-  showPreview();
-  toast('画像を読み込みました');
-}
-function showPreview(){
-  const btn = document.getElementById('pickBtn');
-  const pv  = document.getElementById('preview');
-  if(pickedImg){
-    pv.src = pickedImg;
-    pv.style.display = 'block';
-    btn.classList.add('has-img');
-  } else {
-    pv.style.display = 'none';
-    btn.classList.remove('has-img');
-  }
+  try{
+    const r=await compressToBlob(f);
+    pickedImg={blob:r.blob,ext:r.ext,url:URL.createObjectURL(r.blob)};
+    removeImg=false;
+    showImgPreview(pickedImg.url);
+    toast('画像を読み込みました');
+  }catch(err){ toast('画像の読み込みに失敗しました'); }
 }
 function clearPick(){
-  pickedImg = "";
-  document.getElementById('fFile').value = '';
-  showPreview();
+  pickedImg=null; removeImg=true;
+  document.getElementById('fFile').value='';
+  showImgPreview('');
   toast('画像を取り消しました');
 }
+function showImgPreview(src){
+  const btn=document.getElementById('pickBtn'), pv=document.getElementById('preview');
+  if(src){ pv.src=src; pv.style.display='block'; btn.classList.add('has-img'); btn.querySelector('span.plus').style.display='none'; }
+  else { pv.removeAttribute('src'); pv.style.display='none'; btn.classList.remove('has-img'); btn.querySelector('span.plus').style.display=''; }
+}
 
-/* ── データ ── */
-function load(){
-  let raw;
-  try{
-    const s = localStorage.getItem(KEY);
-    raw = s ? JSON.parse(s) : DEFAULT_CHARS.slice();
-  }catch(e){ raw = DEFAULT_CHARS.slice(); }
-  // 正規化＋同名（同種類）は1体に統合
-  const out=[], idx={};
-  raw.forEach(r=>{
-    const c = normChar(r);
-    if(!c || !c.name) return;
-    const key = c.type+"::"+c.name;
-    if(idx[key]===undefined){ idx[key]=out.length; out.push(c); }
-    else {
-      const e = out[idx[key]];
-      c.moves.forEach(m=>{ if(!e.moves.includes(m)) e.moves.push(m); });
-      if(!e.img && c.img) e.img = c.img;
-      if(!e.video && c.video) e.video = c.video;
-      if((!e.by || e.by==="提供：Coming Soon") && c.by) e.by = c.by;
-    }
-  });
-  out.forEach(c=>c.moves.sort((a,b)=> a==="平面" ? -1 : 1));
-  chars = out;
-  render();
+/* ── 動画（透過WebM等・そのままアップ／20MBまで） ── */
+function onPickVideo(e){
+  const f=e.target.files[0]; if(!f) return;
+  const MAX=20*1024*1024;
+  if(f.size>MAX){ alert('動画が大きすぎます（'+(f.size/1048576).toFixed(1)+'MB）。20MB以下にしてください。\n※ 透過WebM・5〜8秒・音声なし推奨。'); e.target.value=''; return; }
+  pickedVid={blob:f, ext:(f.name.split('.').pop()||'webm').toLowerCase()};
+  removeVid=false;
+  showVidPreview(URL.createObjectURL(f));
+  toast('動画を読み込みました');
 }
-function persist(){
-  try{
-    localStorage.setItem(KEY, JSON.stringify(chars));
-  }catch(e){
-    alert('保存できませんでした。画像が大きすぎる可能性があります。\n枚数を減らすか、画像を小さくしてください。');
-  }
-  render();
+function clearVideo(){
+  pickedVid=null; removeVid=true;
+  document.getElementById('fVid').value='';
+  showVidPreview('');
+  toast('動画を取り消しました');
 }
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showVidPreview(src){
+  const btn=document.getElementById('vidBtn'), pv=document.getElementById('vpreview');
+  if(src){ pv.src=src; pv.style.display='block'; btn.classList.add('has-img'); btn.querySelector('span.plus').style.display='none'; pv.play&&pv.play().catch(()=>{}); }
+  else { pv.removeAttribute('src'); pv.style.display='none'; btn.classList.remove('has-img'); btn.querySelector('span.plus').style.display=''; }
+}
+
+/* ── データ読み込み ── */
+async function load(){
+  try{
+    const { data, error } = await SB.from('site_characters').select('*').order('sort_order',{ascending:true});
+    if(error) throw error;
+    chars = (data||[]).map(r=>({ id:r.id, sort_order:r.sort_order, name:r.name, by:r.credit, type:r.type, moves:r.moves||['平面'], img:r.img||'', video:r.video||'' }));
+    render();
+  }catch(e){ console.error(e); toast('読み込みに失敗しました'); }
+}
 
 function render(){
-  const tb = document.getElementById('listBody');
-  const empty = document.getElementById('emptyMsg');
+  const tb=document.getElementById('listBody'), empty=document.getElementById('emptyMsg');
   document.getElementById('countTxt').textContent = chars.length + "件";
   if(chars.length===0){ tb.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  tb.innerHTML = chars.map((c,i)=>{
-    const img = c.img
-      ? `<img class="thumb" src="${esc(c.img)}" alt="">`
-      : `<div class="thumb-none">なし</div>`;
-    const L = {"平面":"平面的に動く","立体":"立体的に飛び出す"};
-    const moveTags = (c.moves||[]).map(m=>`<span class="tag-move">${L[m]}</span>`).join('');
+  const L={"平面":"平面的に動く","立体":"立体的に飛び出す"};
+  tb.innerHTML = chars.map(c=>{
+    const img = c.img ? `<img class="thumb" src="${esc(c.img)}" alt="">` : `<div class="thumb-none">なし</div>`;
+    const moveTags = (c.moves||[]).map(m=>`<span class="tag-move">${L[m]||esc(m)}</span>`).join('');
     const vidTag = c.video ? '<span class="tag-vid">🎬 動画あり</span>' : '';
-    return `<tr class="${i===editIdx?'editing':''}">
+    return `<tr class="${c.id===editId?'editing':''}">
       <td>${img}</td>
       <td><strong>${esc(c.name)}</strong>${vidTag}</td>
       <td style="font-size:12px;color:var(--g3)">${esc(c.by||'提供：Coming Soon')}</td>
       <td><span class="tag tag-green">${esc(c.type)}</span><br>${moveTags}</td>
       <td><div class="acts">
-        <button class="btn btn-sub btn-sm" onclick="editChar(${i})">編集</button>
-        <button class="btn-del" onclick="delChar(${i})">削除</button>
+        <button class="btn btn-sub btn-sm" onclick="editChar('${c.id}')">編集</button>
+        <button class="btn-del" onclick="delChar('${c.id}')">削除</button>
       </div></td>
     </tr>`;
   }).join('');
 }
 
-function saveChar(){
-  const name = document.getElementById('fName').value.trim();
+async function saveChar(){
+  const name=document.getElementById('fName').value.trim();
   if(!name){ toast('キャラクター名を入力してください'); return; }
-  const moves = [];
+  const moves=[];
   if(document.getElementById('fMove2D').checked) moves.push("平面");
   if(document.getElementById('fMove3D').checked) moves.push("立体");
-  if(moves.length === 0){ toast('動き方を1つ以上選んでください'); return; }
-  const obj = {
-    name: name,
-    by:   document.getElementById('fBy').value.trim() || "提供：Coming Soon",
-    type: document.getElementById('fType').value,
-    moves: moves,
-    img:  pickedImg,
-    video: pickedVid
-  };
-  if(editIdx >= 0){ chars[editIdx] = obj; toast('編集を保存しました'); }
-  else { chars.push(obj); toast('キャラクターを追加しました'); }
-  cancelEdit();
-  persist();
+  if(moves.length===0){ toast('動き方を1つ以上選んでください'); return; }
+  const btn=document.getElementById('btnSave'); btn.disabled=true; btn.textContent='保存中…';
+  try{
+    let img = editCurrent ? editCurrent.img : '';
+    let video = editCurrent ? editCurrent.video : '';
+    if(pickedImg&&pickedImg.blob) img = await uploadToStorage(pickedImg.blob, pickedImg.ext, 'char');
+    else if(removeImg) img='';
+    if(pickedVid&&pickedVid.blob) video = await uploadToStorage(pickedVid.blob, pickedVid.ext, 'char');
+    else if(removeVid) video='';
+    const row = {
+      name, credit: document.getElementById('fBy').value.trim() || "提供：Coming Soon",
+      type: document.getElementById('fType').value, moves,
+      img: img||null, video: video||null
+    };
+    if(editId){ const {error}=await SB.from('site_characters').update(row).eq('id',editId); if(error) throw error; toast('編集を保存しました'); }
+    else { row.sort_order = chars.reduce((m,c)=>Math.max(m,c.sort_order||0),0)+1; const {error}=await SB.from('site_characters').insert(row); if(error) throw error; toast('キャラクターを追加しました'); }
+    cancelEdit(); await load();
+  }catch(e){ console.error(e); alert('保存に失敗しました：'+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent = editId ? '保存する' : '追加する'; }
 }
-function editChar(i){
-  editIdx = i;
-  const c = chars[i];
-  document.getElementById('fName').value = c.name;
-  document.getElementById('fBy').value   = c.by || '';
-  document.getElementById('fType').value = c.type;
-  document.getElementById('fMove2D').checked = c.moves.includes("平面");
-  document.getElementById('fMove3D').checked = c.moves.includes("立体");
-  pickedImg = c.img || "";
-  pickedVid = c.video || "";
-  showPreview();
-  showVideoPreview();
-  document.getElementById('formTitle').textContent = 'キャラクターを編集';
-  document.getElementById('formSub').textContent = '「' + c.name + '」を編集しています。';
-  document.getElementById('btnSave').textContent = '保存する';
-  document.getElementById('btnCancel').style.display = 'inline-block';
+function editChar(id){
+  const c=chars.find(x=>x.id===id); if(!c) return;
+  editId=id; editCurrent=c;
+  pickedImg=null; removeImg=false; pickedVid=null; removeVid=false;
+  document.getElementById('fName').value=c.name;
+  document.getElementById('fBy').value=c.by||'';
+  document.getElementById('fType').value=c.type;
+  document.getElementById('fMove2D').checked=(c.moves||[]).includes("平面");
+  document.getElementById('fMove3D').checked=(c.moves||[]).includes("立体");
+  document.getElementById('fFile').value=''; document.getElementById('fVid').value='';
+  showImgPreview(c.img||''); showVidPreview(c.video||'');
+  document.getElementById('formTitle').textContent='キャラクターを編集';
+  document.getElementById('formSub').textContent='「'+c.name+'」を編集しています。';
+  document.getElementById('btnSave').textContent='保存する';
+  document.getElementById('btnCancel').style.display='inline-block';
   document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
   render();
 }
 function cancelEdit(){
-  editIdx = -1;
+  editId=null; editCurrent=null;
+  pickedImg=null; removeImg=false; pickedVid=null; removeVid=false;
   ['fName','fBy'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fType').value='イラスト';
-  document.getElementById('fMove2D').checked = true;
-  document.getElementById('fMove3D').checked = false;
-  document.getElementById('fFile').value='';
-  document.getElementById('fVid').value='';
-  pickedImg = "";
-  pickedVid = "";
-  showPreview();
-  showVideoPreview();
-  document.getElementById('formTitle').textContent = 'キャラクターを追加';
-  document.getElementById('formSub').textContent = '必要な項目を入力して「追加する」を押してください。';
-  document.getElementById('btnSave').textContent = '追加する';
-  document.getElementById('btnCancel').style.display = 'none';
+  document.getElementById('fMove2D').checked=true;
+  document.getElementById('fMove3D').checked=false;
+  document.getElementById('fFile').value=''; document.getElementById('fVid').value='';
+  showImgPreview(''); showVidPreview('');
+  document.getElementById('formTitle').textContent='キャラクターを追加';
+  document.getElementById('formSub').textContent='必要な項目を入力して「追加する」を押してください。';
+  document.getElementById('btnSave').textContent='追加する';
+  document.getElementById('btnCancel').style.display='none';
   render();
 }
-function delChar(i){
-  if(!confirm('「' + chars[i].name + '」を削除しますか？')) return;
-  chars.splice(i,1);
-  if(editIdx===i) cancelEdit();
-  toast('削除しました');
-  persist();
-}
-function resetAll(){
-  if(!confirm('最初の状態（サンプル5件）に戻します。よろしいですか？')) return;
-  chars = DEFAULT_CHARS.slice();
-  cancelEdit();
-  toast('初期状態に戻しました');
-  persist();
-}
-
-function toast(msg){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('on');
-  setTimeout(()=>el.classList.remove('on'), 2200);
+async function delChar(id){
+  const c=chars.find(x=>x.id===id); if(!c) return;
+  if(!confirm('「'+c.name+'」を削除しますか？')) return;
+  try{
+    const {error}=await SB.from('site_characters').delete().eq('id',id); if(error) throw error;
+    if(editId===id) cancelEdit();
+    await load(); toast('削除しました');
+  }catch(e){ console.error(e); alert('削除に失敗しました：'+(e.message||e)); }
 }
 </script>
 </body>

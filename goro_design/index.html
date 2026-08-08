@@ -1267,10 +1267,22 @@ function viewCreatorDetail(c) {
   window.location.href = 'goro_creator_detail.html';
 }
 
+async function loadCharSelectFromSupabase(){
+  try{
+    if(!CASES_SB && window.supabase) CASES_SB = window.supabase.createClient(CASES_SB_URL, CASES_SB_KEY);
+    if(!CASES_SB) return;
+    const { data, error } = await CASES_SB.from('site_characters').select('*').order('sort_order', { ascending: true });
+    if(error) throw error;
+    const mapped = (data||[]).map(r=>({ name:r.name, by:r.credit, type:r.type, moves:r.moves||['平面'], img:r.img||'', video:r.video||'' }));
+    if(mapped.length){ SEL_CHARACTERS = mergeChars(mapped); cselExpanded = false; renderCharSelect(); }
+  }catch(e){ console.error('chars load', e); }
+}
+
 renderCases();
 renderCreators();
 renderCharSelect();
 initCharSelectTabs();
+loadCharSelectFromSupabase();
 
 
 </script>
