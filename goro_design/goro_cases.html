@@ -171,8 +171,7 @@
     <!-- 未ログイン時 -->
     <div class="login-box" id="login-box" style="display:none">
       <h3>管理ログイン</h3>
-      <p>事例の編集には、登録済みのメールアドレスとパスワードでログインしてください。<br>一度ログインすれば、この端末では次回から自動でログイン状態になります。</p>
-      <input class="ainput" id="login-email" type="email" placeholder="メールアドレス" autocomplete="username">
+      <p>パスワードを入力してログインしてください。<br>一度ログインすれば、この端末では次回から自動でログイン状態になります。</p>
       <input class="ainput" id="login-pw" type="password" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       <button class="asave-btn" style="margin-top:0" onclick="doLogin()">ログイン</button>
       <div class="login-err" id="login-err"></div>
@@ -242,6 +241,7 @@
 const SUPABASE_URL='https://lcqkgqzdscqhjuyokqvg.supabase.co';
 const SUPABASE_KEY='sb_publishable_r8frHUI_SuPtFa0La0hUuQ_8UqFuQ79';
 const BUCKET='case-media';
+const ADMIN_EMAIL='gorodesign56@gmail.com';
 
 /* ====== 状態 ====== */
 let SB=null, CASES=[], session=null, editId=null, editCurrent=null;
@@ -506,11 +506,11 @@ function reflectAuth(){
   if(logged) renderManage();
 }
 async function doLogin(){
-  const email=v('login-email'), pw=document.getElementById('login-pw').value;
+  const pw=document.getElementById('login-pw').value;
   const el=document.getElementById('login-err'); el.textContent='';
-  if(!email||!pw){el.textContent='メールとパスワードを入力してください';return;}
-  const {error}=await SB.auth.signInWithPassword({email,password:pw});
-  if(error){el.textContent='ログインできませんでした：'+error.message;}
+  if(!pw){el.textContent='パスワードを入力してください';return;}
+  const {error}=await SB.auth.signInWithPassword({email:ADMIN_EMAIL,password:pw});
+  if(error){el.textContent='パスワードが違います';}
   else{document.getElementById('login-pw').value='';toast('ログインしました ✓');}
 }
 async function doLogout(){ if(SB){await SB.auth.signOut();} toast('ログアウトしました'); }
