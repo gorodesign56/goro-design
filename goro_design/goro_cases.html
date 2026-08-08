@@ -197,7 +197,7 @@
           </div>
         </div>
         <div>
-          <label class="albl">After AR画像（クリックして選ぶ）</label>
+          <label class="albl">After AR画像（動画を選ぶと自動作成／手動でも可）</label>
           <div class="img-pick-btn" id="btn-aimg">
             <span class="pick-icon">📱</span><span class="pick-label">クリックして選ぶ</span>
             <button class="pick-clear" onclick="clearPick(event,'aimg')">×</button>
@@ -361,6 +361,31 @@ function canBrowserPlay(file){
     v.src=u; document.body.appendChild(v);
   });
 }
+function captureVideoFrame(file){
+  return new Promise(res=>{
+    const v=document.createElement('video');
+    v.preload='auto'; v.muted=true; v.playsInline=true;
+    v.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px';
+    const u=URL.createObjectURL(file);
+    let done=false;
+    const fin=blob=>{if(done)return;done=true;try{URL.revokeObjectURL(u);}catch(e){}v.remove();res(blob);};
+    function grab(){
+      try{
+        const w=v.videoWidth,h=v.videoHeight;
+        if(!w) return fin(null);
+        const s=Math.min(1000/w,1000/h,1);
+        const c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);
+        c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+        c.toBlob(b=>fin(b),'image/jpeg',0.82);
+      }catch(e){fin(null);}
+    }
+    v.onloadeddata=()=>{ let t=0.1; if(v.duration&&v.duration<0.3)t=0; try{v.currentTime=t;}catch(e){grab();} };
+    v.onseeked=grab;
+    v.onerror=()=>fin(null);
+    setTimeout(()=>{ if(!done){ if((v.videoWidth||0)>0) grab(); else fin(null); } },9000);
+    v.src=u; document.body.appendChild(v);
+  });
+}
 async function pickVideo(input){
   const f=input.files[0];
   if(!f){tmp.avideo=null;setVidStatus('');return;}
@@ -379,6 +404,13 @@ async function pickVideo(input){
     return;
   }
   tmp.avideo={blob:f, ext:(ext||'mp4')};
+  // After画像が未指定なら、動画の最初のフレームを自動サムネイルにする
+  const hasAfter = tmp.aimg || (editCurrent && editCurrent.after_img);
+  if(!hasAfter){
+    setVidStatus('動画OK ✓（'+sizeMB.toFixed(1)+'MB）サムネイルを自動作成中…','busy');
+    const frame=await captureVideoFrame(f);
+    if(frame){ tmp.aimg={blob:frame,ext:'jpg'}; showPickPreview('aimg', URL.createObjectURL(frame)); setVidStatus('動画OK ✓ サムネイルも自動作成しました。保存で反映されます','ok'); return; }
+  }
   setVidStatus('動画OK ✓（'+sizeMB.toFixed(1)+'MB）保存すると反映されます','ok');
 }
 
