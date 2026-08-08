@@ -184,10 +184,11 @@
         <input type="file" accept="video/webm,video/mp4" id="fVid" onchange="onPickVideo(event)">
       </div>
       <div class="pick-note">
-        <strong>動く動画（任意・透過WebM推奨）</strong>
+        <strong>動く動画（任意）</strong>
         キャラ選択の上位4体は、この動画が自動でループ再生されます。<br>
-        <span style="color:var(--red);font-weight:600">※ 3MB以下・5〜8秒・音声なし</span> にしてください。<br>
-        未設定なら静止画のまま表示されます。
+        <label class="chk" style="margin:8px 0"><input type="checkbox" id="fChroma"><span>グリーンバック動画（緑を自動で透明化して立体表示）</span></label><br>
+        <span style="color:var(--g3);font-size:12px">※ すでに背景が透明なWebMはチェック不要。緑背景で撮った動画はチェックを入れてください。</span><br>
+        <span style="color:var(--red);font-weight:600">※ 20MB以下・5〜8秒・音声なし</span> 推奨。未設定なら静止画で表示。
         <button class="btn-del" style="margin-top:8px" onclick="clearVideo()">動画を取り消す</button>
       </div>
     </div>
@@ -332,7 +333,7 @@ async function load(){
   try{
     const { data, error } = await SB.from('site_characters').select('*').order('sort_order',{ascending:true});
     if(error) throw error;
-    chars = (data||[]).map(r=>({ id:r.id, sort_order:r.sort_order, name:r.name, by:r.credit, type:r.type, moves:r.moves||['平面'], img:r.img||'', video:r.video||'' }));
+    chars = (data||[]).map(r=>({ id:r.id, sort_order:r.sort_order, name:r.name, by:r.credit, type:r.type, moves:r.moves||['平面'], img:r.img||'', video:r.video||'', chroma:!!r.chroma }));
     render();
   }catch(e){ console.error(e); toast('読み込みに失敗しました'); }
 }
@@ -347,9 +348,10 @@ function render(){
     const img = c.img ? `<img class="thumb" src="${esc(c.img)}" alt="">` : `<div class="thumb-none">なし</div>`;
     const moveTags = (c.moves||[]).map(m=>`<span class="tag-move">${L[m]||esc(m)}</span>`).join('');
     const vidTag = c.video ? '<span class="tag-vid">🎬 動画あり</span>' : '';
+    const chromaTag = c.chroma ? '<span class="tag-vid" style="background:#3f6b52">🟩 緑抜き</span>' : '';
     return `<tr class="${c.id===editId?'editing':''}">
       <td>${img}</td>
-      <td><strong>${esc(c.name)}</strong>${vidTag}</td>
+      <td><strong>${esc(c.name)}</strong>${vidTag}${chromaTag}</td>
       <td style="font-size:12px;color:var(--g3)">${esc(c.by||'提供：Coming Soon')}</td>
       <td><span class="tag tag-green">${esc(c.type)}</span><br>${moveTags}</td>
       <td><div class="acts">
@@ -378,7 +380,8 @@ async function saveChar(){
     const row = {
       name, credit: document.getElementById('fBy').value.trim() || "提供：Coming Soon",
       type: document.getElementById('fType').value, moves,
-      img: img||null, video: video||null
+      img: img||null, video: video||null,
+      chroma: document.getElementById('fChroma').checked
     };
     if(editId){ const {error}=await SB.from('site_characters').update(row).eq('id',editId); if(error) throw error; toast('編集を保存しました'); }
     else { row.sort_order = chars.reduce((m,c)=>Math.max(m,c.sort_order||0),0)+1; const {error}=await SB.from('site_characters').insert(row); if(error) throw error; toast('キャラクターを追加しました'); }
@@ -395,6 +398,7 @@ function editChar(id){
   document.getElementById('fType').value=c.type;
   document.getElementById('fMove2D').checked=(c.moves||[]).includes("平面");
   document.getElementById('fMove3D').checked=(c.moves||[]).includes("立体");
+  document.getElementById('fChroma').checked=!!c.chroma;
   document.getElementById('fFile').value=''; document.getElementById('fVid').value='';
   showImgPreview(c.img||''); showVidPreview(c.video||'');
   document.getElementById('formTitle').textContent='キャラクターを編集';
@@ -411,6 +415,7 @@ function cancelEdit(){
   document.getElementById('fType').value='イラスト';
   document.getElementById('fMove2D').checked=true;
   document.getElementById('fMove3D').checked=false;
+  document.getElementById('fChroma').checked=false;
   document.getElementById('fFile').value=''; document.getElementById('fVid').value='';
   showImgPreview(''); showVidPreview('');
   document.getElementById('formTitle').textContent='キャラクターを追加';

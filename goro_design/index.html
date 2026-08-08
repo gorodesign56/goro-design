@@ -1111,9 +1111,14 @@ function renderCharSelect(){
     const poster   = c.img ? c.img : selPlaceholder('準備中');
     /* 初期表示の4体だけ動画を自動再生（軽さのため） */
     const useVideo = c.video && i < CSEL_INITIAL;
-    const media = useVideo
-      ? `<video src="${c.video}" poster="${c.img||''}" autoplay loop muted playsinline preload="metadata"></video>`
-      : `<img src="${poster}" alt="${c.name}" loading="lazy" onerror="this.src='${selPlaceholder('準備中')}'">`;
+    let media;
+    if(useVideo && c.chroma){
+      media = `<canvas class="csel-chroma" data-src="${c.video}" style="width:100%;height:100%;object-fit:contain;display:block"></canvas>`;
+    } else if(useVideo){
+      media = `<video src="${c.video}" poster="${c.img||''}" autoplay loop muted playsinline preload="metadata"></video>`;
+    } else {
+      media = `<img src="${poster}" alt="${c.name}" loading="lazy" onerror="this.src='${selPlaceholder('準備中')}'">`;
+    }
     const tags = c.moves.map(m => `<span class="csel-tag">${moveLabel[m]}</span>`).join('');
     return `
       <div class="csel-card">
@@ -1126,6 +1131,7 @@ function renderCharSelect(){
         </div>
       </div>`;
   }).join('');
+  grid.querySelectorAll('canvas.csel-chroma').forEach(cv=>startChroma(cv, cv.dataset.src));
 
   /* もっと見る */
   if(moreWrap){
@@ -1146,6 +1152,29 @@ function toggleCselMore(){
     const sec = document.getElementById('charselect');
     if(sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
   }
+}
+/* グリーンバック動画をブラウザで緑抜き（クロマキー）して表示 */
+function startChroma(canvas, src){
+  const video=document.createElement('video');
+  video.src=src; video.muted=true; video.loop=true; video.playsInline=true; video.crossOrigin='anonymous'; video.preload='auto';
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  let w=0,h=0,stopped=false;
+  video.addEventListener('loadeddata',()=>video.play().catch(()=>{}));
+  function fallback(){ stopped=true; const v=document.createElement('video'); v.src=src; v.autoplay=true; v.loop=true; v.muted=true; v.playsInline=true; v.style.cssText='width:100%;height:100%;object-fit:contain;display:block'; try{canvas.replaceWith(v);}catch(e){} v.play().catch(()=>{}); }
+  function frame(){
+    if(stopped) return;
+    if(video.readyState>=2 && video.videoWidth){
+      if(!w){ const MAX=420; const s=Math.min(MAX/video.videoWidth,MAX/video.videoHeight,1); w=Math.round(video.videoWidth*s); h=Math.round(video.videoHeight*s); canvas.width=w; canvas.height=h; }
+      try{
+        ctx.drawImage(video,0,0,w,h);
+        const im=ctx.getImageData(0,0,w,h), d=im.data;
+        for(let i=0;i<d.length;i+=4){ const r=d[i],g=d[i+1],b=d[i+2]; if(g>90 && g>r*1.35 && g>b*1.35){ d[i+3]=0; } }
+        ctx.putImageData(im,0,0);
+      }catch(e){ return fallback(); }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
 function initCharSelectTabs(){
@@ -1177,6 +1206,7 @@ async function loadCreatorsFromSupabase(){
     if(error) throw error;
     const mapped=(data||[]).map(r=>({type:r.type,name:r.name,nameEn:'',spec:r.spec,bio:r.bio,avatar:r.avatar,avatarEmoji:r.emoji,emoji:r.emoji,works:r.works||[],link:r.link,linkText:r.link_text,instagram:r.instagram,twitter:r.twitter}));
     renderCreatorsList(mapped.slice(0,3));
+    // (creators use link_text mapping above)
   }catch(e){ console.error('creators load', e); }
 }
 function renderCreatorsList(list) {
@@ -1282,8 +1312,8 @@ async function loadCharSelectFromSupabase(){
     if(!CASES_SB) return;
     const { data, error } = await CASES_SB.from('site_characters').select('*').order('sort_order', { ascending: true });
     if(error) throw error;
-    const mapped = (data||[]).map(r=>({ name:r.name, by:r.credit, type:r.type, moves:r.moves||['平面'], img:r.img||'', video:r.video||'' }));
-    if(mapped.length){ SEL_CHARACTERS = mergeChars(mapped); cselExpanded = false; renderCharSelect(); }
+    const mapped = (data||[]).map(r=>({ name:r.name, by:r.credit, type:r.type, moves:(r.moves||['平面']).slice().sort((a,b)=>a==='平面'?-1:1), img:r.img||'', video:r.video||'', chroma:!!r.chroma }));
+    if(mapped.length){ SEL_CHARACTERS = mapped; cselExpanded = false; renderCharSelect(); }
   }catch(e){ console.error('chars load', e); }
 }
 
