@@ -173,8 +173,8 @@
     .modal-box{padding:28px 20px}
   }
 </style>
-<script>/* goro_data.js があれば読み込む */</script>
-<script src="goro_data.js" onerror=""></script>
+<!-- クリエイターはSupabaseから読み込む -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <nav>
@@ -277,13 +277,11 @@
     <button class="cancel-btn" id="cancel-btn" style="display:none" onclick="cancelEdit()">キャンセル</button>
     <p class="divider">▼ 登録済みクリエイター（コアは削除不可）</p>
     <div class="entry-list" id="manage-list"></div>
-    <div class="savebox">
-      <strong>⚠ この編集内容はまだサイトに反映されていません</strong>
-      いまの変更は、このブラウザの中だけに保存されています。<br>
-      サイトに反映するには、<a href="goro_admin.html" style="color:#8a6a1f;font-weight:600">管理ハブ</a> で「goro_data.js をダウンロード」して、goro_design フォルダに入れ、Netlify にアップロードしてください。
+    <div class="savebox" style="background:#e7f3ee;border-color:#9fccbd;color:#1e5c4e">
+      <strong style="color:#154438">✓ 変更はすぐにサイトへ反映されます</strong>
+      クリエイターのデータと画像は Supabase に保存されます。goro_data.js のダウンロードやデプロイ作業は不要です。
     </div>
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-      <a href="goro_admin.html" class="asave-btn" style="text-decoration:none;display:inline-block;margin-top:0">管理ハブでダウンロード →</a>
       <button class="close-admin-btn" onclick="closeAdmin()" style="margin-top:0">管理を閉じる</button>
     </div>
   </div>
@@ -358,13 +356,11 @@ async function handleInquirySubmit(e){
 </script>
 
 <script>
-const CORE=[
-  {type:"イラストレーター",name:"823（はつみ）",spec:"あたたかみのある暮らしイラスト\nグッズ・スタンプ制作",bio:"「帰ってきたくなるような絵」をコンセプトに、あたたかさとやさしさを感じる色使いで作品を制作。家モチーフの世界観が特徴で、SUZURIグッズやLINEスタンプも展開中。",avatar:null,emoji:"🏠",works:[],instagram:"https://www.instagram.com/talo.823/",twitter:"https://twitter.com/talo_823",link:"https://lit.link/hatsumi823",linkText:"portfolio : lit.link/hatsumi823"},
-  {type:"漫画家",name:"クリエイター名",spec:"漫画・4コマ・ストーリー漫画\nキャラクターデザイン",bio:"",avatar:null,emoji:"🎨",works:[],link:null,linkText:""},
-  {type:"イラストレーター",name:"ナガレボシ 獅子",spec:"科学・技術イラスト\nキャラクターデザイン",bio:"",avatar:null,emoji:"🦁",works:[],link:"https://nboshi.art",linkText:"portfolio : nboshi.art"},
-  {type:"動画制作",name:"クリエイター名",spec:"動画制作・モーショングラフィック\nアニメーション",bio:"",avatar:null,emoji:"🎥",works:[],link:null,linkText:""}
-];
-const PW="goro2026",KEY="goro_extra_creators",CORE_KEY="goro_core_cr_edits";
+const SUPABASE_URL='https://lcqkgqzdscqhjuyokqvg.supabase.co';
+const SUPABASE_KEY='sb_publishable_r8frHUI_SuPtFa0La0hUuQ_8UqFuQ79';
+const ADMIN_EMAIL='gorodesign56@gmail.com';
+const BUCKET='case-media';
+let SB=null, CREATORS=[], session=null;
 let tmp={avatar:null,works:[null,null,null]};
 
 /* ── 作品画像：{img,x,y,z} 正規化（旧データの文字列も受け付ける） ── */
@@ -514,13 +510,27 @@ function initWorkDrag(i){
   btn.addEventListener('touchend', end);
 }
 [0,1,2].forEach(initWorkDrag);
-let editIdx=-1, editType=null;
+let editId=null, editCurrent=null;
 
-function getExtra(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}}
-function setExtra(a){try{localStorage.setItem(KEY,JSON.stringify(a));return true}catch{alert('保存容量が不足しています。');return false}}
-function getCoreEdits(){try{return JSON.parse(localStorage.getItem(CORE_KEY)||'[]')}catch{return[]}}
-function setCoreEdits(a){localStorage.setItem(CORE_KEY,JSON.stringify(a))}
-function getEffectiveCore(i){const e=getCoreEdits();return e[i]?{...CORE[i],...e[i]}:CORE[i]}
+function dataURLtoBlob(d){const [h,b]=d.split(',');const mime=(h.match(/:(.*?);/)||[])[1]||'image/jpeg';const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:mime});}
+async function uploadIfDataURL(val){
+  if(!val) return null;
+  if(!String(val).startsWith('data:')) return val;
+  const blob=dataURLtoBlob(val);
+  const ext=(blob.type.split('/')[1]||'jpg').replace('jpeg','jpg');
+  const path='creator/'+Date.now()+'_'+Math.random().toString(36).slice(2,8)+'.'+ext;
+  const {error}=await SB.storage.from(BUCKET).upload(path,blob,{contentType:blob.type,upsert:false});
+  if(error) throw error;
+  return SB.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+async function load(){
+  try{
+    const {data,error}=await SB.from('site_creators').select('*').order('sort_order',{ascending:true});
+    if(error) throw error;
+    CREATORS=(data||[]).map(r=>({id:r.id,sort_order:r.sort_order,type:r.type,name:r.name,spec:r.spec,bio:r.bio,avatar:r.avatar,emoji:r.emoji,works:r.works||[],link:r.link,linkText:r.link_text,instagram:r.instagram,twitter:r.twitter}));
+    renderAll(); renderManage();
+  }catch(e){ console.error(e); }
+}
 function v(id){return document.getElementById(id).value.trim()}
 
 async function compress(file){return new Promise(r=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const M=600,ra=Math.min(M/img.naturalWidth,M/img.naturalHeight,1);const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*ra);c.height=Math.round(img.naturalHeight*ra);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',0.72))};img.src=u})}
@@ -562,32 +572,36 @@ function resetForm(){
   ['a-type','a-name','a-spec','a-bio','a-insta','a-twitter','a-link'].forEach(i=>document.getElementById(i).value='');
   clearAvatar();[0,1,2].forEach(i=>clearWork({preventDefault:()=>{},stopPropagation:()=>{}},i));
 }
-function saveCreator(){
+async function saveCreator(){
+  if(!session){alert('ログインしてください');return}
   if(!v('a-name')){alert('名前を入力してください');return}
-  const link=v('a-link'),works=tmp.works.filter(Boolean).map(normWork);
-  const existing=editIdx>=0?(editType==='core'?getEffectiveCore(editIdx):getExtra()[editIdx]):null;
-  const newData={
-    type:v('a-type')||'ILLUSTRATION',name:v('a-name'),spec:v('a-spec'),bio:v('a-bio'),
-    instagram:v('a-insta'),twitter:v('a-twitter'),
-    avatar:tmp.avatar||(existing?existing.avatar:null),
-    emoji:tmp.avatar?null:(existing?existing.emoji:'✏️'),
-    works:works.length?works:(existing?existing.works:[]),
-    link:link||null,linkText:link?'portfolio : '+link.replace(/https?:\/\//,''):''
-  };
-  if(editIdx>=0){
-    if(editType==='core'){const edits=getCoreEdits();edits[editIdx]=newData;setCoreEdits(edits);}
-    else{const arr=getExtra();arr[editIdx]=newData;if(!setExtra(arr))return;}
-    toast('更新しました ✓');
-  } else {
-    const arr=getExtra();arr.push(newData);if(!setExtra(arr))return;
-    toast('クリエイターを追加しました ✓');
-  }
-  cancelEdit();renderAll();renderManage();
+  const btn=document.getElementById('save-btn'); btn.disabled=true; btn.textContent='保存中…';
+  try{
+    const link=v('a-link');
+    const avatarVal = tmp.avatar || (editCurrent?editCurrent.avatar:null);
+    const avatar = await uploadIfDataURL(avatarVal);
+    const worksSrc = tmp.works.filter(Boolean).map(normWork);
+    const works=[];
+    for(const w of worksSrc){ works.push({img:await uploadIfDataURL(w.img), x:w.x, y:w.y, z:w.z, fit:w.fit}); }
+    const finalWorks = works.length ? works : (editCurrent?editCurrent.works:[]);
+    const row={
+      type:v('a-type')||'ILLUSTRATION', name:v('a-name'), spec:v('a-spec'), bio:v('a-bio'),
+      instagram:v('a-insta')||null, twitter:v('a-twitter')||null,
+      avatar:avatar||null, emoji: avatar?null:(editCurrent?editCurrent.emoji:'✏️'),
+      works: finalWorks,
+      link:link||null, link_text: link?('portfolio : '+link.replace(/https?:\/\//,'')):null
+    };
+    if(editId){ const {error}=await SB.from('site_creators').update(row).eq('id',editId); if(error) throw error; toast('更新しました ✓'); }
+    else { row.sort_order=CREATORS.reduce((m,c)=>Math.max(m,c.sort_order||0),0)+1; const {error}=await SB.from('site_creators').insert(row); if(error) throw error; toast('クリエイターを追加しました ✓'); }
+    cancelEdit(); await load();
+  }catch(e){ console.error(e); alert('保存に失敗しました：'+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent = editId ? '更新する' : '追加する'; }
 }
-function editCreator(type,i){
-  const c=type==='core'?getEffectiveCore(i):getExtra()[i];
+function editCreator(id){
+  const c=CREATORS.find(x=>x.id===id);
   if(!c)return;
-  editIdx=i;editType=type;
+  editId=id;editCurrent=c;
+  tmp={avatar:null,works:[null,null,null]};
   document.getElementById('a-type').value=c.type||'';
   document.getElementById('a-name').value=c.name||'';
   document.getElementById('a-spec').value=c.spec||'';
@@ -615,21 +629,26 @@ function editCreator(type,i){
     initWorkDrag(idx);
   });
   document.getElementById('edit-mode-bar').style.display='block';
-  document.getElementById('edit-mode-name').textContent=c.name+(type==='core'?' (コア)':'');
+  document.getElementById('edit-mode-name').textContent=c.name;
   document.getElementById('save-btn').textContent='更新する';
   document.getElementById('cancel-btn').style.display='inline-block';
   document.getElementById('ap-cr-add').scrollIntoView({behavior:'smooth'});
 }
 function cancelEdit(){
-  editIdx=-1;editType=null;resetForm();
+  editId=null;editCurrent=null;resetForm();
   document.getElementById('edit-mode-bar').style.display='none';
   document.getElementById('save-btn').textContent='追加する';
   document.getElementById('cancel-btn').style.display='none';
 }
-function delCreator(i){const a=getExtra();a.splice(i,1);setExtra(a);if(editIdx===i&&editType==='extra'){cancelEdit();}renderAll();renderManage();toast('削除しました')}
+async function delCreator(id){
+  const c=CREATORS.find(x=>x.id===id); if(!c)return;
+  if(!confirm('「'+c.name+'」を削除しますか？'))return;
+  try{ const {error}=await SB.from('site_creators').delete().eq('id',id); if(error)throw error; if(editId===id)cancelEdit(); await load(); toast('削除しました'); }
+  catch(e){ console.error(e); alert('削除に失敗しました：'+(e.message||e)); }
+}
 
-function viewCreator(type,idx){
-  const c=type==='core'?getEffectiveCore(idx):getExtra()[idx];
+function viewCreator(id){
+  const c=CREATORS.find(x=>x.id===id);
   if(!c)return;
   localStorage.setItem('goro_viewing_creator',JSON.stringify(c));
   window.location.href='goro_creator_detail.html';
@@ -638,10 +657,10 @@ function viewCreator(type,idx){
 const PER_PAGE=6;
 let curPage=1;
 
-function crHTML(c,type,idx){
+function crHTML(c){
   const av=c.avatar?`<div class="cr-avatar"><img src="${c.avatar}"></div>`:`<div class="cr-avatar">${c.emoji||'👤'}</div>`;
   const ws=c.works&&c.works.length?c.works.slice(0,3).map(w=>{const n=normWork(w);return `<div class="cr-work"><img src="${n.img}" style="object-fit:${n.fit?'contain':'cover'};object-position:${n.x}% ${n.y}%;transform:scale(${n.z/100})" loading="lazy"></div>`;}).join(''):'<div class="cr-work">作</div><div class="cr-work">品</div><div class="cr-work">例</div>';
-  return `<div class="cr-card" onclick="viewCreator('${type}',${idx})">${av}<p class="cr-type">${c.type}</p><p class="cr-name">${c.name}</p><p class="cr-spec">${c.spec||''}</p><div class="cr-works">${ws}</div><button class="cr-inquiry-btn" onclick="openInquiry('${c.name.replace(/'/g,"\\'")}', event)">このクリエイターに依頼する</button><span class="cr-hint">詳細を見る →</span></div>`;
+  return `<div class="cr-card" onclick="viewCreator('${c.id}')">${av}<p class="cr-type">${c.type||''}</p><p class="cr-name">${c.name}</p><p class="cr-spec">${c.spec||''}</p><div class="cr-works">${ws}</div><button class="cr-inquiry-btn" onclick="openInquiry('${(c.name||'').replace(/'/g,"\\'")}', event)">このクリエイターに依頼する</button><span class="cr-hint">詳細を見る →</span></div>`;
 }
 
 let currentFilter = 'all';
@@ -655,13 +674,12 @@ function setFilter(type, btn) {
 }
 
 function renderAll(){
-  const coreItems=CORE.map((_,i)=>({c:getEffectiveCore(i),t:'core',i}));
-  const all=[...coreItems,...getExtra().map((c,i)=>({c,t:'extra',i}))];
-  const filtered = currentFilter === 'all' ? all : all.filter(({c}) => c.type === currentFilter);
+  const filtered = currentFilter === 'all' ? CREATORS : CREATORS.filter(c => c.type === currentFilter);
   const total=filtered.length,pages=Math.ceil(total/PER_PAGE);
   if(curPage>pages)curPage=1;
   const start=(curPage-1)*PER_PAGE;
-  document.getElementById('cr-grid').innerHTML=filtered.slice(start,start+PER_PAGE).map(({c,t,i})=>crHTML(c,t,i)).join('') || '<p style="font-size:13px;color:var(--g3);padding:40px 0">該当するクリエイターはまだいません。</p>';
+  const grid=document.getElementById('cr-grid'); if(!grid) return;
+  grid.innerHTML=filtered.slice(start,start+PER_PAGE).map(crHTML).join('') || '<p style="font-size:13px;color:var(--g3);padding:40px 0">該当するクリエイターはまだいません。</p>';
   const pg=document.getElementById('pagination');
   if(pages<=1){pg.innerHTML='';return}
   pg.innerHTML=Array.from({length:pages},(_,i)=>`<button class="pag-btn${i+1===curPage?' on':''}" onclick="goPage(${i+1})">${i+1}</button>`).join('');
@@ -669,34 +687,35 @@ function renderAll(){
 function goPage(n){curPage=n;renderAll();window.scrollTo({top:0,behavior:'smooth'})}
 
 function renderManage(){
-  const ek=getExtra();
+  const el=document.getElementById('manage-list'); if(!el) return;
   const th=(img)=>img?`<img class="entry-thumb" src="${img}">`:`<div class="entry-thumb" style="display:flex;align-items:center;justify-content:center;font-size:16px;background:#222;border-radius:50%">👤</div>`;
-  document.getElementById('manage-list').innerHTML=
-    CORE.map((c,i)=>{const ec=getEffectiveCore(i);return`<div class="entry-item" style="cursor:pointer" onclick="editCreator('core',${i})">${th(ec.avatar)}<div class="entry-name" style="flex:1"><span style="color:#1a1a18">${ec.name}</span><span class="core-badge">コア</span><div class="entry-sub">${ec.type}</div></div><span style="font-size:11px;color:#8a877f">✏️ 編集</span></div>`}).join('')+
-    ek.map((c,i)=>`<div class="entry-item" style="cursor:pointer" onclick="editCreator('extra',${i})">${th(c.avatar)}<div class="entry-name" style="flex:1"><span style="color:#1a1a18">${c.name}</span><div class="entry-sub">${c.type}</div></div><span style="font-size:11px;color:#8a877f;margin-right:8px">✏️ 編集</span><button class="adel-btn" onclick="event.stopPropagation();delCreator(${i})">削除</button></div>`).join('')+
-    (!ek.length?'<p style="font-size:12px;color:#8a877f;padding:8px 0">追加されたクリエイターはまだいません</p>':'');
+  el.innerHTML=CREATORS.map(c=>`<div class="entry-item" style="cursor:pointer" onclick="editCreator('${c.id}')">${th(c.avatar)}<div class="entry-name" style="flex:1"><span style="color:#1a1a18">${c.name}</span><div class="entry-sub">${c.type||''}</div></div><span style="font-size:11px;color:#8a877f;margin-right:8px">✏️ 編集</span><button class="adel-btn" onclick="event.stopPropagation();delCreator('${c.id}')">削除</button></div>`).join('')
+    ||'<p style="font-size:12px;color:#8a877f;padding:8px 0">クリエイターはまだいません</p>';
 }
-const AUTH='goro_admin_auth';
-function showAdmin(){document.getElementById('admin-panel').style.display='block';renderManage();}
-function openAdmin(){
-  if(localStorage.getItem(AUTH)==='1'){showAdmin();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});return;}
-  const pw=prompt('管理パスワード');
-  if(pw===PW){localStorage.setItem(AUTH,'1');showAdmin();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});}
-  else if(pw!==null)alert('パスワードが違います');
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+/* ── 管理ログイン（パスワードのみ・Supabase） ── */
+async function openAdmin(){
+  if(session){ const p=document.getElementById('admin-panel'); p.style.display='block'; renderManage(); p.scrollIntoView({behavior:'smooth'}); return; }
+  const pw=prompt('管理パスワード'); if(pw===null) return;
+  const {error}=await SB.auth.signInWithPassword({email:ADMIN_EMAIL,password:pw});
+  if(error){ alert('パスワードが違います'); return; }
+  session=(await SB.auth.getSession()).data.session;
+  const p=document.getElementById('admin-panel'); p.style.display='block'; renderManage(); p.scrollIntoView({behavior:'smooth'});
 }
 function closeAdmin(){document.getElementById('admin-panel').style.display='none';window.scrollTo({top:0,behavior:'smooth'})}
-function doLogout(){localStorage.removeItem(AUTH);location.reload();}
-// 管理画面から遷移してきた場合は自動で開く
-if(localStorage.getItem(AUTH)==='1'){document.addEventListener('DOMContentLoaded',()=>{showAdmin();});}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
-renderAll();
+async function doLogout(){ if(SB) await SB.auth.signOut(); location.reload(); }
 
-// URLパラメーターからフィルターを自動適用
-const urlFilter = new URLSearchParams(window.location.search).get('filter');
-if(urlFilter) {
-  const btn = [...document.querySelectorAll('.filter-btn')].find(b => b.textContent === urlFilter);
-  if(btn) setFilter(urlFilter, btn);
+async function boot(){
+  if(!window.supabase){ document.getElementById('cr-grid').innerHTML='<p style="padding:40px;color:#8a877f">接続に失敗しました。再読み込みしてください。</p>'; return; }
+  SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  const {data:{session:s}}=await SB.auth.getSession(); session=s;
+  await load();
+  const urlFilter=new URLSearchParams(window.location.search).get('filter');
+  if(urlFilter){ const b=[...document.querySelectorAll('.filter-btn')].find(x=>x.textContent.trim()===urlFilter); if(b) setFilter(urlFilter,b); }
+  if(session){ const p=document.getElementById('admin-panel'); if(p) p.style.display='block'; renderManage(); }
 }
+document.addEventListener('DOMContentLoaded', boot);
 </script>
 </body>
 </html>

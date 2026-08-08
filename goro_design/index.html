@@ -1163,14 +1163,23 @@ function initCharSelectTabs(){
 }
 
 function renderCreators() {
-  let effectiveCreators;
-  if (typeof GORO_BAKED_DATA !== 'undefined') {
-    effectiveCreators = GORO_BAKED_DATA.creators;
-  } else {
-    effectiveCreators = CREATORS.map((cr, i) => getLocalOverride('goro_core_cr_edits', i, cr));
-  }
-  const list = effectiveCreators.slice(0, 3);
-
+  let fb;
+  if (typeof GORO_BAKED_DATA !== 'undefined' && GORO_BAKED_DATA.creators) fb = GORO_BAKED_DATA.creators;
+  else fb = CREATORS.map((cr, i) => getLocalOverride('goro_core_cr_edits', i, cr));
+  renderCreatorsList((fb||[]).slice(0,3));
+  loadCreatorsFromSupabase();
+}
+async function loadCreatorsFromSupabase(){
+  try{
+    if(!CASES_SB && window.supabase) CASES_SB = window.supabase.createClient(CASES_SB_URL, CASES_SB_KEY);
+    if(!CASES_SB) return;
+    const { data, error } = await CASES_SB.from('site_creators').select('*').order('sort_order',{ascending:true});
+    if(error) throw error;
+    const mapped=(data||[]).map(r=>({type:r.type,name:r.name,nameEn:'',spec:r.spec,bio:r.bio,avatar:r.avatar,avatarEmoji:r.emoji,emoji:r.emoji,works:r.works||[],link:r.link,linkText:r.link_text,instagram:r.instagram,twitter:r.twitter}));
+    renderCreatorsList(mapped.slice(0,3));
+  }catch(e){ console.error('creators load', e); }
+}
+function renderCreatorsList(list) {
   document.getElementById('creatorsGrid').innerHTML = list.map(cr => {
     const emoji = cr.avatarEmoji || cr.emoji || '👤';
     const av = cr.avatar
