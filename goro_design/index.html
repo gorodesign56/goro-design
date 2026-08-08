@@ -343,8 +343,10 @@
   .ar-dot{transition:background .15s, transform .15s}
   .case-img-clickable:focus-visible{outline:3px solid var(--black);outline-offset:2px}
 </style>
-<script>/* goro_data.js があれば読み込む */</script>
+<script>/* goro_data.js があれば読み込む（キャラ/クリエイター用） */</script>
 <script src="goro_data.js" onerror=""></script>
+<!-- 事例はSupabaseから読み込む -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -970,13 +972,10 @@ function closeCaseVideo(e) {
   modal.classList.remove('open');
 }
 
-function renderCases() {
-  let effectiveCases;
-  if (typeof GORO_BAKED_DATA !== 'undefined') {
-    effectiveCases = GORO_BAKED_DATA.cases;
-  } else {
-    effectiveCases = CASES.map((c, i) => getLocalOverride('goro_core_case_edits', i, c));
-  }
+const CASES_SB_URL='https://lcqkgqzdscqhjuyokqvg.supabase.co';
+const CASES_SB_KEY='sb_publishable_r8frHUI_SuPtFa0La0hUuQ_8UqFuQ79';
+let CASES_SB=null;
+function renderCasesGrid(effectiveCases){
   document.getElementById('casesGrid').innerHTML = effectiveCases.map(c => `
     <div class="case-card">
       <div class="case-head">
@@ -999,6 +998,29 @@ function renderCases() {
         </div>
       </div>
     </div>`).join('');
+}
+async function renderCases() {
+  // まず旧データで即描画（体感速度＆フォールバック）
+  try {
+    let fallback;
+    if (typeof GORO_BAKED_DATA !== 'undefined' && GORO_BAKED_DATA.cases) fallback = GORO_BAKED_DATA.cases;
+    else fallback = CASES.map((c, i) => getLocalOverride('goro_core_case_edits', i, c));
+    if (fallback && fallback.length) renderCasesGrid(fallback);
+  } catch (e) {}
+  // Supabaseの最新データで上書き
+  try {
+    if (!CASES_SB && window.supabase) CASES_SB = window.supabase.createClient(CASES_SB_URL, CASES_SB_KEY);
+    if (!CASES_SB) return;
+    const { data, error } = await CASES_SB.from('site_cases').select('*').order('sort_order', { ascending: true });
+    if (error) throw error;
+    const mapped = (data || []).map(r => ({
+      client: r.client, type: r.type,
+      beforeImg: r.before_img, beforeLabel: r.before_label,
+      afterImg: r.after_img || r.before_img, afterLabel: r.after_label,
+      afterVideo: r.after_video
+    }));
+    if (mapped.length) renderCasesGrid(mapped);
+  } catch (e) { console.error('cases load', e); }
 }
 
 /* ── キャラクター選択（データは goro_data.js から読み込み。管理画面 goro_characters.html で編集） ── */
