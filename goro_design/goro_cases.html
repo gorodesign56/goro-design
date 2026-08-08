@@ -52,6 +52,7 @@
   .case-caption{padding:12px 14px;font-size:12px;color:var(--g4);line-height:1.7;font-weight:500;display:flex;align-items:flex-start;gap:6px}
   .chk{color:var(--green);font-size:13px;margin-top:1px;flex-shrink:0}
   .arr-col{display:flex;align-items:center;justify-content:center;border-left:2px solid var(--g2);border-right:2px solid var(--g2);font-size:16px;color:var(--g3)}
+  .grid-msg{grid-column:1/-1;padding:40px;text-align:center;color:var(--g3);font-size:13px;background:var(--white)}
   footer{padding:28px 40px;border-top:var(--bd-dark);display:flex;justify-content:space-between;align-items:center}
   .fl-logo{font-family:var(--serif);font-size:15px;letter-spacing:.1em;font-weight:600}
   .fl-copy{font-size:12px;color:var(--g3);font-weight:500}
@@ -79,6 +80,7 @@
   .pick-clear:hover{background:#b0472f;color:#fff}
   .asave-btn{padding:12px 32px;font-size:14px;font-weight:600;background:#1a1a18;color:#fff;border:none;cursor:pointer;font-family:var(--sans);transition:background .15s;margin-top:8px}
   .asave-btn:hover{background:#1e5c4e}
+  .asave-btn:disabled{opacity:.5;cursor:default}
   .edit-mode-bar{display:none;background:#fff8e6;border:1px solid #e0c98a;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#8a6a1f}
   .cancel-edit-btn{margin-left:12px;padding:12px 20px;font-size:13px;background:#fff;border:1px solid #1a1a18;color:#1a1a18;cursor:pointer;font-family:var(--sans)}
   .cancel-edit-btn:hover{background:#f0efe9}
@@ -89,7 +91,6 @@
   .entry-name{font-size:13px;color:#1a1a18;flex:1}.entry-sub{font-size:11px;color:#8a877f}
   .adel-btn{background:#fff;border:1px solid #b0472f;color:#b0472f;font-size:11px;padding:4px 10px;cursor:pointer;font-family:var(--sans);flex-shrink:0}
   .adel-btn:hover{background:#b0472f;color:#fff}
-  .core-badge{font-size:10px;color:#1e5c4e;border:1px solid #1e5c4e;padding:2px 6px;margin-left:6px}
   .divider{font-size:12px;color:#5a5855;margin:24px 0 8px;font-weight:600}
   .close-admin-btn{margin-top:32px;font-size:13px;color:#5a5855;background:#fff;border:1px solid #cfccc4;padding:8px 20px;cursor:pointer;font-family:var(--sans)}
   .close-admin-btn:hover{border-color:#1a1a18;color:#1a1a18}
@@ -102,8 +103,18 @@
   .adminnav a.on{background:#1a1a18;color:#fff;border-color:#1a1a18}
   .adminnav a.out{border-color:#b0472f;color:#b0472f}
   .adminnav a.out:hover{background:#b0472f;color:#fff}
-  .savebox{background:#fff8e6;border:1px solid #e0c98a;padding:16px 18px;margin-top:20px;font-size:13px;color:#6b5518;line-height:1.9}
-  .savebox strong{display:block;color:#4a3a0f;margin-bottom:6px}
+  .savebox{background:#e7f3ee;border:1px solid #9fccbd;padding:16px 18px;margin-top:20px;font-size:13px;color:#1e5c4e;line-height:1.9}
+  .savebox strong{display:block;color:#154438;margin-bottom:6px}
+  .login-box{max-width:380px;background:#fff;border:1px solid #e0ddd5;padding:24px}
+  .login-box h3{font-size:15px;margin-bottom:6px;color:#1a1a18}
+  .login-box p{font-size:12px;color:#8a877f;margin-bottom:16px;line-height:1.7}
+  .login-box .ainput{margin-bottom:12px}
+  .login-err{font-size:12px;color:#b0472f;min-height:16px;margin-top:6px}
+  .vid-pick{display:flex;flex-direction:column;gap:8px}
+  .vid-status{font-size:12px;color:#5a5855;min-height:16px}
+  .vid-status.busy{color:#8a6a1f}.vid-status.ok{color:#1e5c4e}.vid-status.err{color:#b0472f}
+  .progress{height:6px;background:#e6e3db;border-radius:3px;overflow:hidden;display:none;margin:2px 0}
+  .progress > i{display:block;height:100%;width:0;background:#1e5c4e;transition:width .2s}
   .toast{position:fixed;bottom:32px;right:32px;background:#1e5c4e;color:#fff;padding:12px 20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
   .toast.show{opacity:1}
   @media(max-width:768px){
@@ -115,8 +126,8 @@
     #admin-panel{padding:48px 20px}
   }
 </style>
-<script>/* goro_data.js があれば読み込む */</script>
-<script src="goro_data.js" onerror=""></script>
+<!-- Supabase クライアント -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <nav>
@@ -133,7 +144,7 @@
     <span class="sec-ey">ALL CASES</span>
     <h2 class="sec-h">事例一覧</h2>
     <p class="sec-sub">ゴローデザインが手掛けたARデザインの実績です。</p>
-    <div class="cases-grid" id="cases-grid"></div>
+    <div class="cases-grid" id="cases-grid"><div class="grid-msg">読み込み中…</div></div>
   </div>
 </section>
 
@@ -156,230 +167,365 @@
     </ul>
   </nav>
   <div class="admin-inn">
-    <h2 class="admin-h">事例の管理</h2>
-    <p class="admin-sub">画像はクリックして選ぶだけ。自動圧縮して保存されます。<br>登録済みの事例は下の一覧から<strong style="color:#1a1a18">クリックで再編集</strong>できます。</p>
-    <div class="edit-mode-bar" id="edit-mode-bar"></div>
-    <div class="arow">
-      <div><label class="albl">クライアント名</label><input class="ainput" id="a-client" placeholder="例：株式会社〇〇 様"></div>
-      <div><label class="albl">AR種別</label><input class="ainput" id="a-type" placeholder="例：名刺 × キャラクターアニメ"></div>
+
+    <!-- 未ログイン時 -->
+    <div class="login-box" id="login-box" style="display:none">
+      <h3>管理ログイン</h3>
+      <p>事例の編集には、登録済みのメールアドレスとパスワードでログインしてください。<br>一度ログインすれば、この端末では次回から自動でログイン状態になります。</p>
+      <input class="ainput" id="login-email" type="email" placeholder="メールアドレス" autocomplete="username">
+      <input class="ainput" id="login-pw" type="password" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="asave-btn" style="margin-top:0" onclick="doLogin()">ログイン</button>
+      <div class="login-err" id="login-err"></div>
     </div>
-    <div class="arow">
-      <div>
-        <label class="albl">Before画像（クリックして選ぶ）</label>
-        <div class="img-pick-btn" id="btn-bimg">
-          <span class="pick-icon">🖼</span><span class="pick-label">クリックして選ぶ</span>
-          <button class="pick-clear" onclick="clearPick(event,'bimg')">×</button>
-          <input type="file" accept="image/*" onchange="pickImg(this,'bimg')">
+
+    <!-- ログイン後 -->
+    <div id="admin-content" style="display:none">
+      <h2 class="admin-h">事例の管理</h2>
+      <p class="admin-sub">画像はクリックして選ぶだけ（自動で圧縮）。動画はファイルを選ぶだけ（MOV等は自動でweb用mp4に変換）。<br>保存すると<strong style="color:#1e5c4e">すぐにサイトへ反映</strong>されます（GitHubやデプロイの作業は不要）。<br>登録済みの事例は下の一覧から<strong style="color:#1a1a18">クリックで再編集</strong>できます。</p>
+      <div class="edit-mode-bar" id="edit-mode-bar"></div>
+      <div class="arow">
+        <div><label class="albl">クライアント名</label><input class="ainput" id="a-client" placeholder="例：株式会社〇〇 様"></div>
+        <div><label class="albl">AR種別</label><input class="ainput" id="a-type" placeholder="例：名刺 × キャラクターアニメ"></div>
+      </div>
+      <div class="arow">
+        <div>
+          <label class="albl">Before画像（クリックして選ぶ）</label>
+          <div class="img-pick-btn" id="btn-bimg">
+            <span class="pick-icon">🖼</span><span class="pick-label">クリックして選ぶ</span>
+            <button class="pick-clear" onclick="clearPick(event,'bimg')">×</button>
+            <input type="file" accept="image/*" onchange="pickImg(this,'bimg')">
+          </div>
+        </div>
+        <div>
+          <label class="albl">After AR画像（クリックして選ぶ）</label>
+          <div class="img-pick-btn" id="btn-aimg">
+            <span class="pick-icon">📱</span><span class="pick-label">クリックして選ぶ</span>
+            <button class="pick-clear" onclick="clearPick(event,'aimg')">×</button>
+            <input type="file" accept="image/*" onchange="pickImg(this,'aimg')">
+          </div>
         </div>
       </div>
-      <div>
-        <label class="albl">After AR画像（クリックして選ぶ）</label>
-        <div class="img-pick-btn" id="btn-aimg">
-          <span class="pick-icon">📱</span><span class="pick-label">クリックして選ぶ</span>
-          <button class="pick-clear" onclick="clearPick(event,'aimg')">×</button>
-          <input type="file" accept="image/*" onchange="pickImg(this,'aimg')">
+      <div class="arow">
+        <div><label class="albl">Beforeの説明</label><input class="ainput" id="a-blbl" value="普段の名刺"></div>
+        <div><label class="albl">After ARの説明文</label><input class="ainput" id="a-albl" placeholder="例：スマホをかざすと〇〇が動く"></div>
+      </div>
+      <div class="arow1" style="border:1px solid #cfccc4;padding:14px;margin-bottom:16px">
+        <label class="albl" style="color:#1a1a18;margin-bottom:8px">🎬 After ARの動画（任意）</label>
+        <div class="vid-pick">
+          <input type="file" accept="video/*" id="a-videofile" onchange="pickVideo(this)">
+          <div class="progress" id="vid-progress"><i></i></div>
+          <div class="vid-status" id="vid-status"></div>
+          <label class="albl" style="margin-top:6px">または YouTube URL</label>
+          <input class="ainput" id="a-avideo" placeholder="https://youtu.be/xxxx（任意）">
         </div>
+        <p style="font-size:11px;color:#8a877f;margin-top:8px">※ 動画を選ぶと、MOVなどブラウザで再生しづらい形式は自動的にweb用mp4へ変換します（大きい動画は変換に時間がかかります）。<br>※ 画像と動画の両方がある場合は動画が優先されます（画像はサムネイルになります）。</p>
+      </div>
+      <button class="asave-btn" id="save-btn" onclick="saveCase()">追加する</button>
+      <button class="cancel-edit-btn" id="cancel-btn" style="display:none" onclick="cancelEdit()">キャンセル</button>
+      <p class="divider">▼ 登録済み事例（クリックで編集）</p>
+      <div class="entry-list" id="manage-list"></div>
+      <div class="savebox">
+        <strong>✓ 変更はすぐにサイトへ反映されます</strong>
+        事例のデータと画像・動画は Supabase に保存されます。goro_data.js の作り直しや、Netlify/Cloudflare へのデプロイ作業は不要です。
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="close-admin-btn" onclick="closeAdmin()" style="margin-top:0">管理を閉じる</button>
       </div>
     </div>
-    <div class="arow">
-      <div><label class="albl">Beforeの説明</label><input class="ainput" id="a-blbl" value="普段の名刺"></div>
-      <div><label class="albl">After ARの説明文</label><input class="ainput" id="a-albl" placeholder="例：スマホをかざすと〇〇が動く"></div>
-    </div>
-    <div class="arow1" style="border:1px solid #2a2a28;padding:14px;margin-bottom:16px">
-      <label class="albl" style="color:#1a1a18;margin-bottom:8px">🎬 After ARを動画にする場合（任意）</label>
-      <input class="ainput" id="a-avideo" placeholder="動画ファイル名（例：images/case5_video.mp4）または YouTubeのURL">
-      <p style="font-size:11px;color:#8a877f;margin-top:5px">※ 動画ファイル名（例：images/case5_video.mp4）を入れると、After AR画像をタップしてその場で再生できます。<br>※ YouTubeのURL（https://youtu.be/xxxx）を入れた場合は、従来通り別タブで開きます。<br>※ 画像と動画の両方がある場合は動画が優先されます。</p>
-    </div>
-    <button class="asave-btn" id="save-btn" onclick="saveCase()">追加する</button>
-    <button class="cancel-edit-btn" id="cancel-btn" style="display:none" onclick="cancelEdit()">キャンセル</button>
-    <p class="divider">▼ 登録済み事例（コアは削除不可）</p>
-    <div class="entry-list" id="manage-list"></div>
-    <div class="savebox">
-      <strong>⚠ この編集内容はまだサイトに反映されていません</strong>
-      いまの変更は、このブラウザの中だけに保存されています。<br>
-      サイトに反映するには、<a href="goro_admin.html" style="color:#8a6a1f;font-weight:600">管理ハブ</a> で「goro_data.js をダウンロード」して、goro_design フォルダに入れ、Netlify にアップロードしてください。
-    </div>
-    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-      <a href="goro_admin.html" class="asave-btn" style="text-decoration:none;display:inline-block;margin-top:0">管理ハブでダウンロード →</a>
-      <button class="close-admin-btn" onclick="closeAdmin()" style="margin-top:0">管理を閉じる</button>
-    </div>
+
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-const CORE=[
-  {client:"イラストレーター823 様",type:"名刺 × キャラクターアニメ",beforeImg:"images/case1_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case1_after.jpg",afterLabel:"スマホをかざすとご自身のキャラクターが動くオリジナルアニメが流れる",afterVideo:"images/case1_video.mp4"},
-  {client:"株式会社ネオマチ 様",type:"カード × ゲームキャラクター動画",beforeImg:"images/case2_before.jpg",beforeLabel:"ゲームの販促カード",afterImg:"images/case2_after.jpg",afterLabel:"ゲームタイトルのキャラクターが画面で動き出す動画体験",afterVideo:"images/case2_video.mp4"},
-  {client:"似顔絵師・四季彩画家 神生 様",type:"名刺 × 自己紹介動画",beforeImg:"images/case3_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case3_after.jpg",afterLabel:"ご本人様が自己紹介する動画が流れる。名刺を渡すだけで人柄まで伝わる",afterVideo:"images/case3_video.mp4"},
-  {client:"ギャラリーゴロー 溝口聡志",type:"名刺 × 自己紹介動画",beforeImg:"images/case4_before.jpg",beforeLabel:"普段の名刺",afterImg:"images/case4_after.jpg",afterLabel:"名刺にかざすと本人が登場。ギャラリーゴローの活動をその場で紹介できる",afterVideo:"images/case4_video.mp4"}
-];
-const PW="goro2026",KEY="goro_extra_cases",CORE_KEY="goro_core_case_edits";
-let tmp={bimg:null,aimg:null};
-let editIdx=-1, editType=null;
-function getExtra(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}}
-function setExtra(a){try{localStorage.setItem(KEY,JSON.stringify(a));return true}catch{alert('保存容量が不足しています。');return false}}
-function getCoreEdits(){try{return JSON.parse(localStorage.getItem(CORE_KEY)||'[]')}catch{return[]}}
-function setCoreEdits(a){localStorage.setItem(CORE_KEY,JSON.stringify(a))}
-function getEffectiveCore(i){const e=getCoreEdits();return e[i]?{...CORE[i],...e[i]}:CORE[i]}
-function v(id){return document.getElementById(id).value.trim()}
+/* ====== 設定 ====== */
+const SUPABASE_URL='https://lcqkgqzdscqhjuyokqvg.supabase.co';
+const SUPABASE_KEY='sb_publishable_r8frHUI_SuPtFa0La0hUuQ_8UqFuQ79';
+const BUCKET='case-media';
 
-async function compress(file){return new Promise(r=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const M=600,ra=Math.min(M/img.naturalWidth,M/img.naturalHeight,1);const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*ra);c.height=Math.round(img.naturalHeight*ra);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',0.72))};img.src=u})}
+/* ====== 状態 ====== */
+let SB=null, CASES=[], session=null, editId=null, editCurrent=null;
+let tmp={bimg:null,aimg:null,avideo:null}; // {blob,ext} or null（未変更なら null で既存を維持）
+
+/* ====== 共通 ====== */
+function v(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function isYouTube(url){return /youtu\.be|youtube\.com/i.test(url||'');}
+
+/* ====== 公開ページ描画 ====== */
+function afterMedia(c){
+  const poster=esc(c.after_img||c.before_img||'');
+  if(c.after_video){
+    if(isYouTube(c.after_video)){
+      return `<img src="${poster}" loading="lazy"><a href="${esc(c.after_video)}" target="_blank" rel="noopener" class="video-link-btn">▶ 動画を見る →</a>`;
+    }
+    return `<button type="button" class="case-img-clickable" onclick="playInline(this, this.dataset.src)" data-src="${esc(c.after_video)}" aria-label="${esc(c.client)}の動画を再生"><img src="${poster}" alt="After" loading="lazy"></button><span class="ar-dot">▶</span>`;
+  }
+  return `<img src="${poster}" loading="lazy">`;
+}
+function playInline(btn, src){
+  const container=btn.parentElement;
+  const dot=container.querySelector('.ar-dot'); if(dot) dot.remove();
+  const video=document.createElement('video');
+  video.src=src; video.controls=true; video.playsInline=true;
+  video.style.cssText='width:100%;height:100%;object-fit:contain;background:#000;display:block';
+  video.onerror=()=>{video.onerror=null;alert('この動画を読み込めませんでした。時間をおいて再度お試しください。');};
+  btn.replaceWith(video); video.play().catch(()=>{});
+}
+function caseHTML(c){
+  return `<div class="case-card">
+    <div class="case-head"><span class="case-client">${esc(c.client)}</span><span class="case-type">${esc(c.type)}</span></div>
+    <div class="case-ba">
+      <div><div class="case-side-lbl">Before</div><div class="case-img"><img src="${esc(c.before_img)}" loading="lazy"></div><div class="case-caption">${esc(c.before_label)}</div></div>
+      <div class="arr-col">→</div>
+      <div><div class="case-side-lbl al">After AR</div><div class="case-img" style="position:relative">${afterMedia(c)}</div><div class="case-caption"><span class="chk">✓</span><span>${esc(c.after_label)}</span></div></div>
+    </div>
+  </div>`;
+}
+function renderAll(){
+  const grid=document.getElementById('cases-grid');
+  if(!CASES.length){grid.innerHTML='<div class="grid-msg">事例はまだありません。</div>';return;}
+  grid.innerHTML=CASES.map(caseHTML).join('');
+}
+async function loadCases(){
+  try{
+    const {data,error}=await SB.from('site_cases').select('*').order('sort_order',{ascending:true});
+    if(error) throw error;
+    CASES=data||[]; renderAll();
+  }catch(e){
+    console.error(e);
+    document.getElementById('cases-grid').innerHTML='<div class="grid-msg">読み込みに失敗しました。時間をおいて再読み込みしてください。</div>';
+  }
+}
+
+/* ====== 画像：圧縮してBlob化 ====== */
+async function compressToBlob(file){
+  return new Promise((res,rej)=>{
+    const img=new Image(), u=URL.createObjectURL(file);
+    img.onload=()=>{
+      const M=1000, ra=Math.min(M/img.naturalWidth,M/img.naturalHeight,1);
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.naturalWidth*ra); c.height=Math.round(img.naturalHeight*ra);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(u);
+      c.toBlob(b=>b?res(b):rej(new Error('圧縮失敗')),'image/jpeg',0.82);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('画像を読めません'));};
+    img.src=u;
+  });
+}
 async function pickImg(input,key){
-  const f=input.files[0];if(!f)return;
-  const d=await compress(f);tmp[key]=d;
-  const btn=document.getElementById('btn-'+key);btn.classList.add('has-img');
-  let im=btn.querySelector('img.preview');if(!im){im=document.createElement('img');im.className='preview';btn.insertBefore(im,btn.querySelector('input'));}
-  im.src=d;btn.querySelectorAll('.pick-icon,.pick-label').forEach(e=>e.style.display='none');
-  const ov=btn.querySelector('.pick-overlay')||document.createElement('div');ov.className='pick-overlay';ov.textContent='クリックで変更';if(!btn.querySelector('.pick-overlay'))btn.appendChild(ov);
+  const f=input.files[0]; if(!f) return;
+  try{
+    const blob=await compressToBlob(f);
+    tmp[key]={blob,ext:'jpg'};
+    const preview=URL.createObjectURL(blob);
+    showPickPreview(key,preview);
+  }catch(e){alert('画像の読み込みに失敗しました');}
 }
 function clearPick(e,key){
   e.preventDefault();e.stopPropagation();tmp[key]=null;
   const btn=document.getElementById('btn-'+key);btn.classList.remove('has-img');
   const im=btn.querySelector('img.preview');if(im)im.remove();
   const ov=btn.querySelector('.pick-overlay');if(ov)ov.remove();
-  btn.querySelectorAll('.pick-icon,.pick-label').forEach(e=>e.style.display='');
+  btn.querySelectorAll('.pick-icon,.pick-label').forEach(el=>el.style.display='');
   const fi=btn.querySelector('input[type=file]');if(fi)fi.value='';
 }
-
-// 既存画像をピッカーにプレビューとして表示（ファイルパスまたはbase64）
 function showPickPreview(key, src){
   if(!src)return;
-  const btn=document.getElementById('btn-'+key);
-  btn.classList.add('has-img');
+  const btn=document.getElementById('btn-'+key);btn.classList.add('has-img');
   let im=btn.querySelector('img.preview');
   if(!im){im=document.createElement('img');im.className='preview';btn.insertBefore(im,btn.querySelector('input'));}
   im.src=src;
-  btn.querySelectorAll('.pick-icon,.pick-label').forEach(e=>e.style.display='none');
-  const ov=btn.querySelector('.pick-overlay')||document.createElement('div');
-  ov.className='pick-overlay';ov.textContent='クリックで変更';
-  if(!btn.querySelector('.pick-overlay'))btn.appendChild(ov);
+  btn.querySelectorAll('.pick-icon,.pick-label').forEach(el=>el.style.display='none');
+  let ov=btn.querySelector('.pick-overlay');
+  if(!ov){ov=document.createElement('div');ov.className='pick-overlay';btn.appendChild(ov);}
+  ov.textContent='クリックで変更';
 }
 
-function saveCase(){
-  if(!v('a-client')){alert('クライアント名を入力してください');return}
-  const existing = editIdx>=0 ? (editType==='core' ? getEffectiveCore(editIdx) : getExtra()[editIdx]) : null;
-  const bImg = tmp.bimg || (existing ? existing.beforeImg : null);
-  const aImg = tmp.aimg || (existing ? existing.afterImg : null);
-  if(!bImg){alert('Before画像を選んでください');return}
-  if(!aImg&&!v('a-avideo')&&!existing?.afterVideo){alert('After画像か動画URLを入力してください');return}
-  const newData={
-    client:v('a-client'),type:v('a-type')||'名刺 × AR',
-    beforeImg:bImg,beforeLabel:v('a-blbl')||'普段の名刺',
-    afterImg:aImg,afterVideo:v('a-avideo')||(existing?existing.afterVideo:null)||null,
-    afterLabel:v('a-albl')||'AR体験'
-  };
-  if(editIdx>=0){
-    if(editType==='core'){const edits=getCoreEdits();edits[editIdx]=newData;setCoreEdits(edits);}
-    else{const arr=getExtra();arr[editIdx]=newData;if(!setExtra(arr))return;}
-    toast('更新しました ✓');
-  } else {
-    if(!tmp.bimg){alert('Before画像を選んでください');return}
-    const arr=getExtra();arr.push(newData);if(!setExtra(arr))return;
-    toast('事例を追加しました ✓');
-  }
-  cancelEdit();renderAll();renderManage();
+/* ====== 動画：必要なら ffmpeg.wasm でmp4へ変換 ====== */
+function setVidStatus(msg,cls){const el=document.getElementById('vid-status');el.textContent=msg||'';el.className='vid-status'+(cls?' '+cls:'');}
+function setVidProgress(p){const b=document.getElementById('vid-progress');if(p==null){b.style.display='none';b.querySelector('i').style.width='0';return;}b.style.display='block';b.querySelector('i').style.width=Math.round(p*100)+'%';}
+
+const GOOD_BRANDS=['isom','mp41','mp42','iso2','iso4','iso5','iso6','avc1','dash','M4V ','mmp4'];
+async function needsConversion(file){
+  const name=(file.name||'').toLowerCase();
+  if(/\.(mov|avi|mkv|webm|m4v|3gp|wmv|flv)$/.test(name)) return true;
+  let brand='';
+  try{const head=new Uint8Array(await file.slice(0,12).arrayBuffer());brand=String.fromCharCode.apply(null,head.slice(8,12));}catch(e){}
+  const goodBrand=GOOD_BRANDS.includes(brand);
+  const canPlay=await new Promise(r=>{
+    const vid=document.createElement('video'),u=URL.createObjectURL(file);
+    vid.muted=true;vid.src=u;
+    vid.onloadeddata=()=>{URL.revokeObjectURL(u);r(true);};
+    vid.onerror=()=>{URL.revokeObjectURL(u);r(false);};
+    setTimeout(()=>{try{URL.revokeObjectURL(u);}catch(e){}r(false);},8000);
+  });
+  return !(goodBrand && canPlay);
 }
-function editCase(type,i){
-  const c = type==='core' ? getEffectiveCore(i) : getExtra()[i];
-  if(!c)return;
-  editIdx=i;editType=type;
+let _ffmpeg=null;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('読込失敗:'+src));document.head.appendChild(s);});}
+async function getFFmpeg(){
+  if(_ffmpeg) return _ffmpeg;
+  if(!window.FFmpegWASM) await loadScript('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js');
+  if(!window.FFmpegUtil) await loadScript('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js');
+  const {FFmpeg}=window.FFmpegWASM;
+  const {toBlobURL}=window.FFmpegUtil;
+  const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+  const ff=new FFmpeg();
+  await ff.load({
+    coreURL: await toBlobURL(base+'/ffmpeg-core.js','text/javascript'),
+    wasmURL: await toBlobURL(base+'/ffmpeg-core.wasm','application/wasm')
+  });
+  _ffmpeg=ff; return ff;
+}
+async function convertToMp4(file){
+  const ff=await getFFmpeg();
+  const {fetchFile}=window.FFmpegUtil;
+  ff.on('progress',({progress})=>{if(progress>=0&&progress<=1)setVidProgress(progress);});
+  await ff.writeFile('in', await fetchFile(file));
+  await ff.exec(['-i','in','-vf','scale=\'min(1280,iw)\':-2','-c:v','libx264','-preset','veryfast','-crf','26','-pix_fmt','yuv420p','-c:a','aac','-b:a','128k','-movflags','+faststart','out.mp4']);
+  const data=await ff.readFile('out.mp4');
+  return new Blob([data.buffer],{type:'video/mp4'});
+}
+async function pickVideo(input){
+  const f=input.files[0]; if(!f){tmp.avideo=null;setVidStatus('');setVidProgress(null);return;}
+  setVidStatus('動画を確認中…','busy');
+  try{
+    const conv=await needsConversion(f);
+    if(conv){
+      setVidStatus('web用mp4に変換中…（大きい動画は数分かかることがあります）','busy');
+      setVidProgress(0);
+      const blob=await convertToMp4(f);
+      setVidProgress(null);
+      tmp.avideo={blob,ext:'mp4'};
+      setVidStatus('変換できました ✓（保存で反映されます）','ok');
+    }else{
+      tmp.avideo={blob:f,ext:'mp4'};
+      setVidStatus('動画OK ✓（そのままweb再生できます）','ok');
+    }
+  }catch(e){
+    console.error(e);
+    setVidProgress(null);
+    tmp.avideo={blob:f,ext:(f.name.split('.').pop()||'mp4')};
+    setVidStatus('⚠ 自動変換できませんでした。元の動画のまま保存します（PCで再生できない場合はmp4で書き出して選び直してください）','err');
+  }
+}
+
+/* ====== Storage アップロード ====== */
+async function uploadToStorage(blob, ext, subdir){
+  const path=subdir+'/'+Date.now()+'_'+Math.random().toString(36).slice(2,8)+'.'+ext;
+  const {error}=await SB.storage.from(BUCKET).upload(path, blob, {contentType:blob.type||undefined,upsert:false});
+  if(error) throw error;
+  return SB.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+/* ====== 保存・編集・削除 ====== */
+async function saveCase(){
+  if(!session){alert('ログインしてください');return;}
+  const client=v('a-client'); if(!client){alert('クライアント名を入力してください');return;}
+  const btn=document.getElementById('save-btn'); const label=btn.textContent;
+  btn.disabled=true; btn.textContent='保存中…';
+  try{
+    const before_img = tmp.bimg?.blob ? await uploadToStorage(tmp.bimg.blob,'jpg','img') : (editCurrent?editCurrent.before_img:null);
+    const after_img  = tmp.aimg?.blob ? await uploadToStorage(tmp.aimg.blob,'jpg','img') : (editCurrent?editCurrent.after_img:null);
+    let after_video;
+    const yt=v('a-avideo');
+    if(tmp.avideo?.blob){ setVidStatus('動画をアップロード中…','busy'); after_video=await uploadToStorage(tmp.avideo.blob,tmp.avideo.ext||'mp4','video'); setVidStatus('動画アップ完了 ✓','ok'); }
+    else if(yt){ after_video=yt; }
+    else { after_video = editCurrent?editCurrent.after_video:null; }
+    if(!before_img){alert('Before画像を選んでください');return;}
+    if(!after_img && !after_video){alert('After画像か動画を入れてください');return;}
+    const row={client, type:v('a-type')||'名刺 × AR', before_img, after_img, after_video,
+               before_label:v('a-blbl')||'普段の名刺', after_label:v('a-albl')||'AR体験'};
+    if(editId){
+      const {error}=await SB.from('site_cases').update(row).eq('id',editId); if(error) throw error;
+      toast('更新しました ✓');
+    }else{
+      row.sort_order=CASES.reduce((m,c)=>Math.max(m,c.sort_order||0),0)+1;
+      const {error}=await SB.from('site_cases').insert(row); if(error) throw error;
+      toast('事例を追加しました ✓');
+    }
+    cancelEdit(); await loadCases(); renderManage();
+  }catch(e){ console.error(e); alert('保存に失敗しました：'+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent=editId?'更新する':'追加する'; if(!editId)btn.textContent=label==='保存中…'?'追加する':label; }
+}
+function editCase(id){
+  const c=CASES.find(x=>x.id===id); if(!c) return;
+  editId=id; editCurrent=c; tmp={bimg:null,aimg:null,avideo:null};
   document.getElementById('a-client').value=c.client||'';
   document.getElementById('a-type').value=c.type||'';
-  document.getElementById('a-blbl').value=c.beforeLabel||'普段の名刺';
-  document.getElementById('a-albl').value=c.afterLabel||'';
-  document.getElementById('a-avideo').value=c.afterVideo||'';
-  showPickPreview('bimg',c.beforeImg);
-  showPickPreview('aimg',c.afterImg);
-  // 編集モード表示
+  document.getElementById('a-blbl').value=c.before_label||'普段の名刺';
+  document.getElementById('a-albl').value=c.after_label||'';
+  document.getElementById('a-avideo').value=isYouTube(c.after_video)?c.after_video:'';
+  document.getElementById('a-videofile').value='';
+  showPickPreview('bimg',c.before_img); showPickPreview('aimg',c.after_img);
+  setVidProgress(null);
+  setVidStatus(c.after_video?(isYouTube(c.after_video)?'現在：YouTube動画':'現在：動画あり（変更する場合のみ選び直す）'):'', c.after_video?'ok':'');
   const bar=document.getElementById('edit-mode-bar');
-  if(bar){bar.style.display='block';bar.textContent='✏️ 編集モード：'+c.client+(type==='core'?' (コア)':'');}
-  const sb=document.getElementById('save-btn');if(sb)sb.textContent='更新する';
-  const cb=document.getElementById('cancel-btn');if(cb)cb.style.display='inline-block';
-  document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});
+  bar.style.display='block'; bar.textContent='✏️ 編集モード：'+(c.client||'');
+  document.getElementById('save-btn').textContent='更新する';
+  document.getElementById('cancel-btn').style.display='inline-block';
+  document.getElementById('admin-content').scrollIntoView({behavior:'smooth'});
 }
 function cancelEdit(){
-  editIdx=-1;editType=null;
-  ['a-client','a-type','a-albl','a-avideo'].forEach(i=>document.getElementById(i).value='');
+  editId=null; editCurrent=null; tmp={bimg:null,aimg:null,avideo:null};
+  ['a-client','a-type','a-albl','a-avideo'].forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});
   document.getElementById('a-blbl').value='普段の名刺';
+  const vf=document.getElementById('a-videofile');if(vf)vf.value='';
+  setVidStatus(''); setVidProgress(null);
   clearPick({preventDefault:()=>{},stopPropagation:()=>{}},'bimg');
   clearPick({preventDefault:()=>{},stopPropagation:()=>{}},'aimg');
   const bar=document.getElementById('edit-mode-bar');if(bar)bar.style.display='none';
-  const sb=document.getElementById('save-btn');if(sb)sb.textContent='追加する';
-  const cb=document.getElementById('cancel-btn');if(cb)cb.style.display='none';
+  document.getElementById('save-btn').textContent='追加する';
+  document.getElementById('cancel-btn').style.display='none';
 }
-function delCase(i){const a=getExtra();a.splice(i,1);setExtra(a);if(editIdx===i&&editType==='extra'){cancelEdit();}renderAll();renderManage();toast('削除しました')}
-function isYouTube(url){return /youtu\.be|youtube\.com/i.test(url||'');}
-function afterMedia(c){
-  const img=`<img src="${c.afterImg}" loading="lazy">`;
-  if(c.afterVideo){
-    if(isYouTube(c.afterVideo)){
-      // YouTubeのURL：従来通り別タブで開く
-      return img+`<a href="${c.afterVideo}" target="_blank" class="video-link-btn">▶ 動画を見る →</a>`;
-    }
-    // mp4など自前動画：クリックでその場再生（トップと同じ）
-    return `<button type="button" class="case-img-clickable" onclick="playInline(this, '${c.afterVideo}')" aria-label="${c.client}の動画を再生"><img src="${c.afterImg}" alt="After" loading="lazy"></button><span class="ar-dot">▶</span>`;
-  }
-  return img;
-}
-function playInline(btn, src){
-  const container=btn.parentElement;
-  const dot=container.querySelector('.ar-dot');
-  if(dot) dot.remove();
-  const video=document.createElement('video');
-  video.src=src;
-  video.controls=true;
-  video.playsInline=true;
-  video.style.width='100%';
-  video.style.height='100%';
-  video.style.objectFit='contain';
-  video.style.background='#000';
-  video.style.display='block';
-  video.onerror=()=>{video.onerror=null;alert('この動画はまだ準備中です。もうしばらくお待ちください。');};
-  btn.replaceWith(video);
-  video.play().catch(()=>{});
-}
-function caseHTML(c){
-  return `<div class="case-card">
-    <div class="case-head"><span class="case-client">${c.client}</span><span class="case-type">${c.type}</span></div>
-    <div class="case-ba">
-      <div><div class="case-side-lbl">Before</div><div class="case-img"><img src="${c.beforeImg}" loading="lazy"></div><div class="case-caption">${c.beforeLabel}</div></div>
-      <div class="arr-col">→</div>
-      <div><div class="case-side-lbl al">After AR</div><div class="case-img" style="position:relative">${afterMedia(c)}${!c.afterVideo?'<span class="ar-dot">▶</span>':''}</div><div class="case-caption"><span class="chk">✓</span><span>${c.afterLabel}</span></div></div>
-    </div>
-  </div>`
-}
-function renderAll(){
-  let allCases;
-  if(typeof GORO_BAKED_DATA !== 'undefined'){
-    allCases = GORO_BAKED_DATA.cases;
-  } else {
-    const effectiveCore=CORE.map((_,i)=>getEffectiveCore(i));
-    allCases=[...effectiveCore,...getExtra()];
-  }
-  document.getElementById('cases-grid').innerHTML=allCases.map(caseHTML).join('');
+async function delCase(id){
+  const c=CASES.find(x=>x.id===id); if(!c) return;
+  if(!confirm('「'+(c.client||'この事例')+'」を削除します。よろしいですか？')) return;
+  try{
+    const {error}=await SB.from('site_cases').delete().eq('id',id); if(error) throw error;
+    if(editId===id) cancelEdit();
+    await loadCases(); renderManage(); toast('削除しました');
+  }catch(e){ console.error(e); alert('削除に失敗しました：'+(e.message||e)); }
 }
 function renderManage(){
-  const ec=getExtra();
-  document.getElementById('manage-list').innerHTML=
-    CORE.map((c,i)=>{const ec2=getEffectiveCore(i);return`<div class="entry-item" style="cursor:pointer" onclick="editCase('core',${i})" title="クリックで編集"><img class="entry-thumb" src="${ec2.beforeImg}"><div class="entry-name" style="flex:1"><span style="color:#1a1a18">${ec2.client}</span><span class="core-badge">コア</span><div class="entry-sub">${ec2.type}</div></div><span style="font-size:11px;color:#8a877f">✏️ 編集</span></div>`}).join('')+
-    ec.map((c,i)=>`<div class="entry-item" style="cursor:pointer" onclick="editCase('extra',${i})" title="クリックで編集"><img class="entry-thumb" src="${c.beforeImg}"><div class="entry-name" style="flex:1"><span style="color:#1a1a18">${c.client}</span><div class="entry-sub">${c.type}</div></div><span style="font-size:11px;color:#8a877f;margin-right:8px">✏️ 編集</span><button class="adel-btn" onclick="event.stopPropagation();delCase(${i})">削除</button></div>`).join('')+
-    (!ec.length?'<p style="font-size:12px;color:#8a877f;padding:8px 0">追加された事例はまだありません</p>':'');
+  const list=document.getElementById('manage-list');
+  if(!CASES.length){list.innerHTML='<p style="font-size:12px;color:#8a877f;padding:8px 0">事例はまだありません</p>';return;}
+  list.innerHTML=CASES.map(c=>`<div class="entry-item" style="cursor:pointer" onclick="editCase('${c.id}')" title="クリックで編集"><img class="entry-thumb" src="${esc(c.before_img||c.after_img||'')}"><div class="entry-name" style="flex:1"><span style="color:#1a1a18">${esc(c.client)}</span><div class="entry-sub">${esc(c.type)}</div></div><span style="font-size:11px;color:#8a877f;margin-right:8px">✏️ 編集</span><button class="adel-btn" onclick="event.stopPropagation();delCase('${c.id}')">削除</button></div>`).join('');
 }
-const AUTH='goro_admin_auth';
-function showAdmin(){document.getElementById('admin-panel').style.display='block';renderManage();}
-function openAdmin(){
-  if(localStorage.getItem(AUTH)==='1'){showAdmin();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});return;}
-  const pw=prompt('管理パスワード');
-  if(pw===PW){localStorage.setItem(AUTH,'1');showAdmin();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});}
-  else if(pw!==null)alert('パスワードが違います');
+
+/* ====== 認証 ====== */
+function reflectAuth(){
+  const logged=!!session;
+  const lb=document.getElementById('login-box'), ac=document.getElementById('admin-content');
+  if(lb) lb.style.display=logged?'none':'block';
+  if(ac) ac.style.display=logged?'block':'none';
+  if(logged) renderManage();
 }
-function closeAdmin(){document.getElementById('admin-panel').style.display='none';cancelEdit();window.scrollTo({top:0,behavior:'smooth'})}
-function doLogout(){localStorage.removeItem(AUTH);location.reload();}
-if(localStorage.getItem(AUTH)==='1'){document.addEventListener('DOMContentLoaded',()=>{showAdmin();});}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
-renderAll();
+async function doLogin(){
+  const email=v('login-email'), pw=document.getElementById('login-pw').value;
+  const el=document.getElementById('login-err'); el.textContent='';
+  if(!email||!pw){el.textContent='メールとパスワードを入力してください';return;}
+  const {error}=await SB.auth.signInWithPassword({email,password:pw});
+  if(error){el.textContent='ログインできませんでした：'+error.message;}
+  else{document.getElementById('login-pw').value='';toast('ログインしました ✓');}
+}
+async function doLogout(){ if(SB){await SB.auth.signOut();} toast('ログアウトしました'); }
+
+/* ====== 起動 ====== */
+function openAdmin(){document.getElementById('admin-panel').style.display='block';reflectAuth();document.getElementById('admin-panel').scrollIntoView({behavior:'smooth'});}
+function closeAdmin(){document.getElementById('admin-panel').style.display='none';cancelEdit();window.scrollTo({top:0,behavior:'smooth'});}
+async function boot(){
+  if(!window.supabase){document.getElementById('cases-grid').innerHTML='<div class="grid-msg">接続に失敗しました（Supabase読込エラー）。再読み込みしてください。</div>';return;}
+  SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  const {data:{session:s}}=await SB.auth.getSession(); session=s;
+  SB.auth.onAuthStateChange((_e,s2)=>{session=s2;reflectAuth();});
+  reflectAuth();
+  await loadCases();
+}
+document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
 </html>
-
