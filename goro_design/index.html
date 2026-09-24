@@ -1153,8 +1153,88 @@ function toggleCselMore(){
     if(sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
   }
 }
-/* グリーンバック動画をブラウザで緑抜き（クロマキー）＋人物に自動トリミングして表示 */
+/* グリーンバック動画をブラウザで緑抜き（クロマキー）— WebGL高速版＋Canvas2Dフォールバック */
 function startChroma(canvas, src){
+  const video=document.createElement('video');
+  video.src=src; video.muted=true; video.loop=true; video.playsInline=true; video.crossOrigin='anonymous'; video.preload='auto';
+  let w=0, h=0, stopped=false, lastT=-1;
+
+  function fallback(){ stopped=true; const v=document.createElement('video'); v.src=src; v.autoplay=true; v.loop=true; v.muted=true; v.playsInline=true; v.style.cssText='width:100%;height:100%;object-fit:contain;display:block'; try{canvas.replaceWith(v);}catch(e){} v.play().catch(()=>{}); }
+
+  /* --- WebGL版（GPU処理） --- */
+  const gl=canvas.getContext('webgl')||canvas.getContext('experimental-webgl');
+  if(!gl){ return _startChromaCanvas2D(canvas,src); } // WebGL非対応→Canvas2Dへ
+
+  function mkShader(type,src){ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return gl.getShaderParameter(s,gl.COMPILE_STATUS)?s:null; }
+
+  /* 頂点シェーダー: 画面全体を覆う四角形 */
+  const vs=mkShader(gl.VERTEX_SHADER,
+    `attribute vec2 a;varying vec2 v;void main(){v=vec2(a.x*.5+.5,.5-a.y*.5);gl_Position=vec4(a,0.,1.);}`
+  );
+  /* フラグメントシェーダー: デスピル＋クロマキー＋3×3アルファ平滑化（すべてGPUで並列処理） */
+  const fs=mkShader(gl.FRAGMENT_SHADER,`
+    precision mediump float;
+    uniform sampler2D t; uniform vec2 r; varying vec2 v;
+    float ca(vec2 u){
+      vec4 c=texture2D(t,u); float g=c.g-max(c.r,c.b);
+      return g>.176?0.:g>.020?(.176-g)/.157:1.;
+    }
+    void main(){
+      vec4 c=texture2D(t,v); float mx=max(c.r,c.b), gr=c.g-mx;
+      vec2 p=1./r; float a=0.;
+      for(int j=-1;j<=1;j++) for(int i=-1;i<=1;i++) a+=ca(v+vec2(float(i)*p.x,float(j)*p.y));
+      gl_FragColor=vec4(c.r, gr>0.?mx:c.g, c.b, a/9.);
+    }
+  `);
+  if(!vs||!fs){ return _startChromaCanvas2D(canvas,src); }
+
+  const prog=gl.createProgram();
+  gl.attachShader(prog,vs); gl.attachShader(prog,fs); gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){ return _startChromaCanvas2D(canvas,src); }
+  gl.useProgram(prog);
+
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const al=gl.getAttribLocation(prog,'a');
+  gl.enableVertexAttribArray(al); gl.vertexAttribPointer(al,2,gl.FLOAT,false,0,0);
+  gl.uniform1i(gl.getUniformLocation(prog,'t'),0);
+  const ur=gl.getUniformLocation(prog,'r');
+
+  const tex=gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D,tex);
+  [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T].forEach(p=>gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE));
+  [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER].forEach(p=>gl.texParameteri(gl.TEXTURE_2D,p,gl.LINEAR));
+  gl.enable(gl.BLEND);
+  gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+
+  video.addEventListener('loadeddata',()=>video.play().catch(()=>{}));
+  video.addEventListener('error',fallback);
+  function frame(){
+    if(stopped) return;
+    if(video.readyState>=2&&video.videoWidth){
+      if(!w){
+        const MAX=480,s=Math.min(MAX/video.videoWidth,MAX/video.videoHeight,1);
+        w=Math.round(video.videoWidth*s); h=Math.round(video.videoHeight*s);
+        canvas.width=w; canvas.height=h; gl.viewport(0,0,w,h); gl.uniform2f(ur,w,h);
+      }
+      /* 新しいフレームのときだけGPUに転送・描画（無駄な処理を省く） */
+      if(video.currentTime!==lastT){
+        lastT=video.currentTime;
+        try{
+          gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,video);
+          gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+        }catch(e){ return fallback(); }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* Canvas2Dフォールバック（WebGL非対応端末向け・旧実装） */
+function _startChromaCanvas2D(canvas, src){
   const video=document.createElement('video');
   video.src=src; video.muted=true; video.loop=true; video.playsInline=true; video.crossOrigin='anonymous'; video.preload='auto';
   const work=document.createElement('canvas'), wctx=work.getContext('2d',{willReadFrequently:true});
@@ -1166,17 +1246,15 @@ function startChroma(canvas, src){
     wctx.drawImage(video,0,0,w,h);
     const im=wctx.getImageData(0,0,w,h), d=im.data;
     const N=w*h, alpha=new Uint8ClampedArray(N);
-    // パス1：緑かぶり完全除去（デスピル）＋アルファ算出
     for(let p=0,i=0;p<N;p++,i+=4){
       const r=d[i], g=d[i+1], b=d[i+2];
       const mx=r>b?r:b, gr=g-mx;
-      if(gr>0) d[i+1]=mx;                    // 緑成分を隣接色まで落として緑かぶりを消す
+      if(gr>0) d[i+1]=mx;
       let a=d[i+3];
-      if(gr>45) a=0;                          // しっかり緑 → 透明
-      else if(gr>5) a=Math.round(a*Math.max(0,(45-gr)/40)); // 縁を段階的に透明化
+      if(gr>45) a=0;
+      else if(gr>5) a=Math.round(a*Math.max(0,(45-gr)/40));
       alpha[p]=a;
     }
-    // パス2：アルファを3×3で平滑化（縁のギザギザをならす）＋人物範囲
     let minX=w,minY=h,maxX=0,maxY=0,any=false;
     for(let y=0;y<h;y++){
       for(let x=0;x<w;x++){
@@ -1197,13 +1275,12 @@ function startChroma(canvas, src){
       if(!w){ const MAX=480; const s=Math.min(MAX/video.videoWidth,MAX/video.videoHeight,1); w=Math.round(video.videoWidth*s); h=Math.round(video.videoHeight*s); work.width=w; work.height=h; }
       let bb;
       try{ bb=keyAndBox(); }catch(e){ return fallback(); }
-      /* 最初の約25フレームで人物の範囲を統合して固定（動いても切れないように） */
       if(bb && boxFrames<25){
         if(!box) box={...bb};
         else { box.minX=Math.min(box.minX,bb.minX); box.minY=Math.min(box.minY,bb.minY); box.maxX=Math.max(box.maxX,bb.maxX); box.maxY=Math.max(box.maxY,bb.maxY); }
         boxFrames++;
       }
-      const b = box || {minX:0,minY:0,maxX:w-1,maxY:h-1};
+      const b=box||{minX:0,minY:0,maxX:w-1,maxY:h-1};
       const pad=Math.round(Math.max(w,h)*0.05);
       let bx=Math.max(0,b.minX-pad), by=Math.max(0,b.minY-pad);
       let bw=Math.min(w,b.maxX+pad)-bx, bh=Math.min(h,b.maxY+pad)-by;
