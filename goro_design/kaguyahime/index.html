@@ -1,0 +1,318 @@
+<title>絵本の表紙展 かぐや姫</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 縦1列・スマホ前提。夜空を背景に、月の金と竹の緑だけを差す単一テーマ */
+:root{
+  --yoru:#1B2A4E;
+  --yoru-fukai:#131E3A;
+  --gepaku:#F4F1E6;
+  --gekkou:#F2C75C;
+  --take:#5A9B6B;
+  --kasumi:#A6B0CC;
+  --sen:rgba(244,241,230,.16);
+  --mincho:"Zen Old Mincho","Hiragino Mincho ProN",serif;
+  --gothic:"Zen Kaku Gothic New","Hiragino Sans",sans-serif;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--yoru);
+  color:var(--gepaku);
+  font-family:var(--gothic);
+  font-size:16px;
+  line-height:1.85;
+  letter-spacing:.02em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  max-width:580px;
+  margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+section{padding-block:40px;border-top:1px solid var(--sen)}
+h2{
+  font-family:var(--mincho);
+  font-weight:700;
+  font-size:21px;
+  letter-spacing:.1em;
+  margin:0 0 20px;
+  color:var(--gekkou);
+  text-wrap:balance;
+}
+p{margin:0 0 16px;max-width:36em}
+p:last-child{margin-bottom:0}
+
+/* ヒーロー */
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:radial-gradient(120% 80% at 80% 14%, #27376B 0%, var(--yoru) 52%, var(--yoru-fukai) 100%);
+  border-top:0;
+  padding-block:52px 44px;
+}
+.tsuki{
+  position:absolute;top:28px;right:-26px;
+  width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%,#FFF8DF 0%,#F4D179 58%,#DDB357 100%);
+  box-shadow:0 0 70px 18px rgba(242,199,92,.20);
+}
+.hero-inner{position:relative}
+.kai{
+  font-family:var(--mincho);
+  font-size:15px;letter-spacing:.24em;color:var(--kasumi);
+  margin:0 0 6px;
+}
+h1{
+  font-family:var(--mincho);
+  font-weight:900;
+  font-size:clamp(38px,11vw,54px);
+  line-height:1.16;
+  letter-spacing:.06em;
+  margin:0;
+  text-wrap:balance;
+}
+.tema{
+  font-family:var(--mincho);
+  font-size:clamp(20px,5.4vw,25px);
+  letter-spacing:.14em;
+  color:var(--gekkou);
+  margin:10px 0 0;
+}
+.lead{
+  margin:22px 0 0;
+  font-size:17px;
+  max-width:24em;
+}
+.kaiki{
+  margin-top:26px;
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;
+}
+.hidsuke{
+  font-family:var(--mincho);
+  font-size:clamp(23px,6.4vw,30px);
+  font-weight:700;letter-spacing:.03em;
+  font-variant-numeric:tabular-nums;
+}
+.muryo{
+  display:inline-block;
+  background:var(--gekkou);color:var(--yoru-fukai);
+  font-weight:700;font-size:14px;letter-spacing:.08em;
+  padding:5px 13px;border-radius:999px;
+  white-space:nowrap;
+}
+
+/* 情報リスト */
+dl{margin:0;display:grid;gap:14px}
+dl > div{
+  display:grid;
+  grid-template-columns:5.5em minmax(0,1fr);
+  gap:4px 14px;
+  align-items:baseline;
+}
+dt{
+  font-size:13px;letter-spacing:.1em;color:var(--kasumi);
+  border-left:2px solid var(--take);padding-left:9px;
+}
+dd{margin:0;min-width:0}
+dd small{display:block;font-size:14px;color:var(--kasumi);line-height:1.7}
+
+/* 囲み */
+.box{
+  border:1px solid var(--sen);
+  border-radius:4px;
+  padding:20px;
+  background:rgba(244,241,230,.035);
+}
+.box h3{
+  font-family:var(--mincho);font-size:17px;font-weight:700;
+  letter-spacing:.08em;margin:0 0 10px;
+}
+.box p{font-size:15px;line-height:1.8}
+
+/* 作家一覧 */
+.sakka{
+  margin:0;padding:0;list-style:none;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 16px;
+}
+.sakka li{
+  min-width:0;
+  font-size:15px;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--sen);
+}
+.shitagaki{
+  margin-top:18px;font-size:13px;color:var(--gekkou);
+  border:1px dashed var(--gekkou);border-radius:4px;padding:10px 12px;
+}
+
+/* 連絡先 */
+a{color:var(--gekkou)}
+a:hover{color:var(--gepaku)}
+a:focus-visible{outline:2px solid var(--gekkou);outline-offset:3px;border-radius:2px}
+.denwa{
+  font-family:var(--mincho);font-size:22px;letter-spacing:.06em;
+  font-variant-numeric:tabular-nums;
+}
+footer{
+  padding-block:30px 44px;
+  border-top:1px solid var(--sen);
+  font-size:13px;color:var(--kasumi);
+}
+@media (max-width:400px){
+  .sakka{grid-template-columns:1fr}
+  dl > div{grid-template-columns:1fr}
+  dt{border-left:0;border-top:2px solid var(--take);padding-left:0;padding-top:4px}
+}
+</style>
+
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div class="tsuki" aria-hidden="true"></div>
+    <p class="kai">第 3 回</p>
+    <h1>絵本の<br>表紙展</h1>
+    <p class="tema">テーマ：かぐや姫</p>
+    <p class="lead">20名の作家が描く、わたしだけのかぐや姫。</p>
+    <div class="kaiki">
+      <span class="hidsuke">2026.11.2<small>月</small> – 11.8<small>日</small></span>
+      <span class="muryo">入場無料</span>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>出版社に届け。</h2>
+    <p>まだ世に出ていない一冊の、表紙だけを描く展覧会です。中身はなくていい。読んでみたいと思わせる一枚があればいい。</p>
+    <p>第1回は桃太郎、第2回は不思議の国のアリス。3回目のお題は「かぐや姫」です。竹から生まれた姫、五人の求婚者、そして月へ帰る夜。どの場面を表紙にするかは、描く人の自由でした。同じ物語から、20通りのまったく違う世界が並びます。</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>スマホをかざすと、絵が動きます</h2>
+    <div class="box">
+      <h3>動くデザイン × 絵本の表紙展</h3>
+      <p>今回は作品によって、スマートフォンをかざすと絵が動き出します。紙に描かれた一枚が、そのまま動き始める体験です。ぜひスマホを持ってお越しください。</p>
+      <p>動く作品には、その横にQRコードを貼っています。スマートフォンのカメラでQRを読み取ると、そのままブラウザが開きます。アプリのインストールは必要ありません。画面ごしに作品を見ると、絵が動き出します。</p>
+      <p>うまく映らないときは、会場スタッフにお声がけください。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>会期と時間</h2>
+    <dl>
+      <div>
+        <dt>会期</dt>
+        <dd>2026年11月2日（月）〜11月8日（日）<small>11月4日（水）は休廊します</small></dd>
+      </div>
+      <div>
+        <dt>時間</dt>
+        <dd>14:00 〜 18:00<small>最終日11月8日（日）は16:00まで</small></dd>
+      </div>
+      <div>
+        <dt>入場</dt>
+        <dd>無料<small>どなたでもご自由にご覧いただけます</small></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>最終日に交流会をします</h2>
+    <p>11月8日（日）16:00の閉廊後、18:00ごろまで会場で簡単な交流会を開きます。出展作家でなくても、ご来場の方ならどなたでもご参加いただけます。お菓子とジュースをご用意してお待ちしています。</p>
+    <dl>
+      <div>
+        <dt>日時</dt>
+        <dd>11月8日（日）16:00 〜 18:00ごろ</dd>
+      </div>
+      <div>
+        <dt>参加費</dt>
+        <dd>500円<small>お菓子・ジュース代として</small></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>出展作家</h2>
+    <p style="margin-bottom:20px">お名前をタップすると、それぞれのSNSをご覧いただけます。（順不同）</p>
+    <ul class="sakka">
+      <li><a href="https://twitter.com/miotkc" target="_blank" rel="noopener">ツクシ ミヲ</a></li>
+      <li><a href="https://www.instagram.com/lively_art_kayo" target="_blank" rel="noopener">久保園佳代</a></li>
+      <li><a href="https://www.instagram.com/milkteaiisan" target="_blank" rel="noopener">いいさん</a></li>
+      <li><a href="https://www.instagram.com/kuriya_24" target="_blank" rel="noopener">KURI</a></li>
+      <li><a href="https://www.instagram.com/tomokoyamada616" target="_blank" rel="noopener">山田智子</a></li>
+      <li><a href="https://www.instagram.com/tukigirimaru14" target="_blank" rel="noopener">月霧丸</a></li>
+      <li><a href="https://www.instagram.com/ssaattoosato" target="_blank" rel="noopener">sato</a></li>
+      <li><a href="https://www.instagram.com/emiel1225" target="_blank" rel="noopener">坂口博子 emiel</a></li>
+      <li><a href="https://www.instagram.com/ayame.works" target="_blank" rel="noopener">ayame works</a></li>
+      <li><a href="https://www.instagram.com/mizue_no_e" target="_blank" rel="noopener">たいみずえ</a></li>
+      <li><a href="https://www.instagram.com/hoccory.factory" target="_blank" rel="noopener">kiyominn</a></li>
+      <li><a href="https://www.instagram.com/imonnaomi_design" target="_blank" rel="noopener">井門直美</a></li>
+      <li><a href="https://www.instagram.com/kumiko_oekaki" target="_blank" rel="noopener">わたなべくみこ</a></li>
+      <li><a href="https://www.instagram.com/neil_niiru_" target="_blank" rel="noopener">にいる</a></li>
+      <li><a href="https://www.instagram.com/kazzartlif" target="_blank" rel="noopener">北原かずこ</a></li>
+      <li><a href="https://www.instagram.com/natte_santa" target="_blank" rel="noopener">ちゅんてぃー</a></li>
+      <li><a href="https://x.com/urupon_g" target="_blank" rel="noopener">うるぽろ</a></li>
+      <li><a href="https://www.instagram.com/ogisoayaka" target="_blank" rel="noopener">おぎそあやか</a></li>
+      <li><a href="https://www.instagram.com/c.yumiii" target="_blank" rel="noopener">Yumi</a></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>会場へのアクセス</h2>
+    <dl>
+      <div>
+        <dt>会場</dt>
+        <dd>額縁のギャラリーゴロー 2階ギャラリー<small>1階は額縁工房です</small></dd>
+      </div>
+      <div>
+        <dt>住所</dt>
+        <dd>〒536-0014<br>大阪市城東区鴫野西2-19-9 川崎ビル</dd>
+      </div>
+      <div>
+        <dt>最寄駅</dt>
+        <dd>JR京橋駅 南口から徒歩10分</dd>
+      </div>
+    </dl>
+    <p style="margin-top:20px"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A7%E9%98%AA%E5%B8%82%E5%9F%8E%E6%9D%B1%E5%8C%BA%E9%B4%AB%E9%87%8E%E8%A5%BF2-19-9" target="_blank" rel="noopener">Googleマップで場所を見る</a></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>お問い合わせ</h2>
+    <dl>
+      <div>
+        <dt>電話</dt>
+        <dd><span class="denwa">070-8348-8340</span></dd>
+      </div>
+      <div>
+        <dt>Web</dt>
+        <dd><a href="https://www.g-goro.co.jp/" target="_blank" rel="noopener">www.g-goro.co.jp</a></dd>
+      </div>
+      <div>
+        <dt>SNS</dt>
+        <dd><a href="https://www.instagram.com/gallerygoro/" target="_blank" rel="noopener">Instagram @gallerygoro</a><br><a href="https://x.com/gallery_goro" target="_blank" rel="noopener">X @gallery_goro</a></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    第3回 絵本の表紙展「かぐや姫」／ 額縁のギャラリーゴロー
+  </div>
+</footer>
