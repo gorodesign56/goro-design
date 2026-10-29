@@ -107,9 +107,12 @@ h1{
 }
 
 /* チラシ */
-.chirashi{margin:26px 0 0}
-.chirashi img{
-  display:block;width:100%;max-width:420px;height:auto;
+.chirashi-row{
+  margin-top:26px;display:flex;flex-wrap:wrap;gap:22px;
+}
+.chirashi{margin:0;flex:1 1 220px;min-width:0;max-width:300px}
+.chirashi img,.chirashi video{
+  display:block;width:100%;height:auto;background:var(--yoru-fukai);
   border:1px solid var(--sen);border-radius:4px;
 }
 .chirashi figcaption{
@@ -200,10 +203,16 @@ footer{
     <h2>出版社に届け。</h2>
     <p>まだ世に出ていない一冊の、表紙だけを描く展覧会です。中身はなくていい。読んでみたいと思わせる一枚があればいい。</p>
     <p>第1回は桃太郎、第2回は不思議の国のアリス。3回目のお題は「かぐや姫」です。竹から生まれた姫、五人の求婚者、そして月へ帰る夜。どの場面を表紙にするかは、描く人の自由でした。同じ物語から、20通りのまったく違う世界が並びます。</p>
-    <figure class="chirashi">
-      <img src="flyer.jpg" alt="第3回 絵本の表紙展「かぐや姫」のチラシ" width="1100" height="1556">
-      <figcaption>会場で配布しているチラシです</figcaption>
-    </figure>
+    <div class="chirashi-row">
+      <figure class="chirashi">
+        <img src="flyer.jpg" alt="第3回 絵本の表紙展「かぐや姫」のチラシ" width="1100" height="1556">
+        <figcaption>会場で配布しているチラシ</figcaption>
+      </figure>
+      <figure class="chirashi">
+        <video src="ar.mp4" poster="ar_poster.jpg" controls playsinline preload="none" width="720" height="1018"></video>
+        <figcaption>そのチラシにスマホをかざすと、こう動きます</figcaption>
+      </figure>
+    </div>
   </div>
 </section>
 
